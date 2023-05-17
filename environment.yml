@@ -1,0 +1,14 @@
+name: fpl-data
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - ipython==8.13.2
+  - ipykernel==6.23.1
+  - ipywidgets==8.0.6
+  - numpy==1.24.3
+  - pandas==2.0.1
+  - prefect==2.10.9
+  - pymongo==4.3.3
+  - tqdm==4.65.0
