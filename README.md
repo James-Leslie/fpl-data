@@ -1,2 +1,2 @@
-# fpl-data-pipeline
-Data pipeline that integrates Prefect workflows and MongoDB for processing Fantasy Premier League data.
+# FPL data loader
+Python package for loading and transforming data from the Fantasy Premier Leage API.
