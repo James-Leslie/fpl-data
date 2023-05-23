@@ -39,7 +39,12 @@ def get_element_summary(player_id, type):
 class FplApiData:
 
     def __init__(self):
-        '''Downloads all relevant data from FPL API'''
+        '''Downloads all relevant data from FPL API, including:
+          - elements (players)
+          - element_types (positions)
+          - teams
+          - events (game week dates)
+          - fixtures (schedule)'''
 
         # Bootstrap-static data
         data = requests.get(BASE_URL+'bootstrap-static/').json()
