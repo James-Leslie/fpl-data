@@ -12,7 +12,6 @@ name = "fpl_data"
 version = "0.0.1"
 description = "Your package description"
 url = "https://github.com/James-Leslie/fpl-data"
-license = "MIT"
 
 [project.authors]
 your_name = { email = "contactJames-Leslie@gmail.com" }
