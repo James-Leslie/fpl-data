@@ -12,11 +12,6 @@ name = "fpl_data"
 version = "0.0.1"
 description = "Your package description"
 url = "https://github.com/James-Leslie/fpl-data"
-
-[project.authors]
-your_name = { email = "contactJames-Leslie@gmail.com" }
-
-[project.urls]
-Documentation = "https://github.com/James-Leslie/fpl-data"
-Code = "https://github.com/James-Leslie/fpl-data/src"
-Issues = "https://github.com/James-Leslie/fpl-data/issues"
+authors = [
+  { name="James Leslie", email="contactjamesleslie@gmail.com" },
+]
