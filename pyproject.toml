@@ -1,17 +1,33 @@
 [build-system]
 requires = [
-    "setuptools>=67",
-    "wheel",
-    "tqdm==4.65.0",
-    "requests"
+  "setuptools>=67"
 ]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "fpl_data"
+name = "FPL-data"
 version = "0.0.1"
-description = "Your package description"
-url = "https://github.com/James-Leslie/fpl-data"
+description = "Tools for working with Fantasy Premier League data"
 authors = [
   { name="James Leslie", email="contactjamesleslie@gmail.com" },
 ]
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+  "tqdm==4.65.0"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/James-Leslie/fpl-data"
+"Bug Tracker" = "https://github.com/James-Leslie/fpl-data/issues"
+
+[tool.setuptools]
+# By default, include-package-data is true in pyproject.toml, so you do
+# NOT have to specify this line.
+include-package-data = true
+
+[tool.setuptools.packages.find]
+# scanning for namespace packages is true by default in pyproject.toml, so
+# you do NOT need to include the following line.
+namespaces = true
+where = ["src"]
