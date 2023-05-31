@@ -7,36 +7,6 @@ from fpl_data.utils import drop_keys
 BASE_URL = 'https://fantasy.premierleague.com/api/'
 
 
-def get_element_summary(player_id, type='history'):
-    '''Get all past gameweek/season info for a given player_id,
-       wait between requests to avoid API rate limit'''
-
-    success = False
-    # try until a result is returned
-    while not success:
-        try:
-            # send GET request to BASE_URL/api/element-summary/{PID}/
-            data = requests.get(
-                BASE_URL + 'element-summary/' + str(player_id) + '/').json()
-            success = True
-        except (
-            requests.exceptions.RequestException,
-            requests.exceptions.HTTPError
-        ):
-            # Wait a bit to avoid API rate limits, if needed
-            time.sleep(.3)
-
-    # extract 'history_past' data from response into dataframe
-    data = data[type]
-
-    # season history needs player id column added
-    if type == 'history_past':
-        for d in data:
-            d['element'] = player_id
-
-    return data
-
-
 class FplApiData:
 
     def __init__(self):
@@ -67,3 +37,40 @@ class FplApiData:
         #              'provisional_start_time', 'started', 'stats', 'pulse_id']
         # fixtures = [drop_keys(f, drop_cols) for f in fixtures]
         self.fixtures = fixtures
+
+        # Get current season
+        first_deadline = self.events[0]['deadline_time']
+        # Extract the year portion from the date string
+        year = first_deadline[:4]
+        # Calculate the next year
+        self.season = f'{year}-{str(int(year) + 1)}'
+
+
+def get_element_summary(player_id, type='history'):
+    '''Get all past gameweek/season info for a given player_id,
+       wait between requests to avoid API rate limit'''
+
+    success = False
+    # try until a result is returned
+    while not success:
+        try:
+            # send GET request to BASE_URL/api/element-summary/{PID}/
+            data = requests.get(
+                BASE_URL + 'element-summary/' + str(player_id) + '/').json()
+            success = True
+        except (
+            requests.exceptions.RequestException,
+            requests.exceptions.HTTPError
+        ):
+            # Wait a bit to avoid API rate limits, if needed
+            time.sleep(.3)
+
+    # extract 'history_past' data from response into dataframe
+    data = data[type]
+
+    # season history needs player id column added
+    if type == 'history_past':
+        for d in data:
+            d['element'] = player_id
+
+    return data
