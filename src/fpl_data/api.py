@@ -1,6 +1,6 @@
 import requests
 import time
-# from tqdm.auto import tqdm
+from tqdm.auto import tqdm
 from fpl_data.utils import drop_keys
 
 
@@ -43,10 +43,33 @@ class FplApiData:
         # Extract the year portion from the date string
         year = first_deadline[:4]
         # Calculate the next year
-        self.season = f'{year}-{str(int(year) + 1)}'
+        self.season = f'{year}-{str(int(year) + 1)[-2:]}'
 
 
-def get_element_summary(player_id, type='history'):
+    def get_all_element_summaries(self):
+        '''Get summaries for each element'''
+        history = []
+        history_past = []
+
+        # get all element_ids from self.elements
+        element_ids = [e['id'] for e in self.elements]
+
+        # loop through all element_ids and get summaries
+        for element_id in tqdm(element_ids):
+            summary = get_element_summary(element_id)
+            # combine summaries of all elements together
+            history += summary['history']
+            history_past += summary['history_past']
+
+        # return current and past season summaries together
+        all_summaries = {
+            'history': history,
+            'history_past': history_past
+        }
+        return all_summaries
+
+
+def get_element_summary(player_id):
     '''Get all past gameweek/season info for a given player_id,
        wait between requests to avoid API rate limit'''
 
@@ -65,12 +88,8 @@ def get_element_summary(player_id, type='history'):
             # Wait a bit to avoid API rate limits, if needed
             time.sleep(.3)
 
-    # extract 'history_past' data from response into dataframe
-    data = data[type]
-
-    # season history needs player id column added
-    if type == 'history_past':
-        for d in data:
-            d['element'] = player_id
+    # history_past needs element id key added
+    for d in data['history_past']:
+        d['element'] = player_id
 
     return data
