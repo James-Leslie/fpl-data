@@ -2,9 +2,12 @@ import jsonschema
 from fpl_data.api import FplApiData
 
 
+api_data = FplApiData()
+
+
 def test_elements_schema():
     # Make a request to the API endpoint
-    data = FplApiData().elements
+    data = api_data.elements
 
     # Define the expected schema for the elements property
     expected_elements_schema = {
@@ -118,7 +121,7 @@ def test_elements_schema():
 
 def test_element_types_schema():
     # Make a request to the API endpoint
-    data = FplApiData().element_types
+    data = api_data.element_types
 
     # Define the expected schema for the element_types property
     expected_element_types_schema = {
@@ -158,7 +161,7 @@ def test_element_types_schema():
 
 def test_events_schema():
     # Make a request to the API endpoint
-    data = FplApiData().events
+    data = api_data.events
 
     # Define the expected schema for the events property
     expected_events_schema = {
@@ -222,7 +225,7 @@ def test_events_schema():
 
 def test_teams_schema():
     # Make a request to the API endpoint
-    data = FplApiData().teams
+    data = api_data.teams
 
     # Define the expected schema for the teams property
     expected_teams_schema = {
@@ -269,7 +272,7 @@ def test_teams_schema():
 
 def test_fixtures_schema():
     # Make a request to the API endpoint
-    data = FplApiData().fixtures
+    data = api_data.fixtures
 
     # Define the expected schema for the fixtures property
     expected_fixtures_schema = {
