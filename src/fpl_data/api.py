@@ -1,5 +1,5 @@
 import requests
-# import time
+import time
 # from tqdm.auto import tqdm
 from fpl_data.utils import drop_keys
 
@@ -7,30 +7,34 @@ from fpl_data.utils import drop_keys
 BASE_URL = 'https://fantasy.premierleague.com/api/'
 
 
-# def get_element_summary(player_id, type):
-#     '''Get all past season info for a given player_id,
-#        wait between requests to avoid API rate limit'''
+def get_element_summary(player_id, type='history'):
+    '''Get all past gameweek/season info for a given player_id,
+       wait between requests to avoid API rate limit'''
 
-#     success = False
-#     # try until a result is returned
-#     while not success:
-#         try:
-#             # send GET request to BASE_URL/api/element-summary/{PID}/
-#             data = requests.get(
-#                 BASE_URL + 'element-summary/' + str(player_id) + '/').json()
-#             success = True
-#         except:
-#             # wait a bit to avoid API rate limits, if needed
-#             time.sleep(.3)
+    success = False
+    # try until a result is returned
+    while not success:
+        try:
+            # send GET request to BASE_URL/api/element-summary/{PID}/
+            data = requests.get(
+                BASE_URL + 'element-summary/' + str(player_id) + '/').json()
+            success = True
+        except (
+            requests.exceptions.RequestException,
+            requests.exceptions.HTTPError
+        ):
+            # Wait a bit to avoid API rate limits, if needed
+            time.sleep(.3)
 
-#     # extract 'history_past' data from response into dataframe
-#     df = pd.json_normalize(data[type])
+    # extract 'history_past' data from response into dataframe
+    data = data[type]
 
-#     # season history needs player id column added
-#     if type == 'history_past':
-#         df.insert(0, 'id', player_id)
+    # season history needs player id column added
+    if type == 'history_past':
+        for d in data:
+            d['element'] = player_id
 
-#     return df
+    return data
 
 
 class FplApiData:

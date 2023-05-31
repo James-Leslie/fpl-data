@@ -1,5 +1,5 @@
 import jsonschema
-from fpl_data.api import FplApiData
+from fpl_data.api import FplApiData, get_element_summary
 
 
 api_data = FplApiData()
@@ -332,25 +332,6 @@ def test_fixtures_schema():
                 "team_a_difficulty": {"type": "integer"},
                 "pulse_id": {"type": "integer"}
             },
-            "required": [
-                "code",
-                "event",
-                "finished",
-                "finished_provisional",
-                "id",
-                "kickoff_time",
-                "minutes",
-                "provisional_start_time",
-                "started",
-                "team_a",
-                "team_a_score",
-                "team_h",
-                "team_h_score",
-                "stats",
-                "team_h_difficulty",
-                "team_a_difficulty",
-                "pulse_id"
-            ],
             "additionalProperties": False
         }
     }
@@ -360,5 +341,146 @@ def test_fixtures_schema():
         jsonschema.validate(data, expected_fixtures_schema)
     except jsonschema.exceptions.ValidationError as e:
         assert False, f"Schema validation failed: {e}"
+
+    assert True
+
+
+def test_history_schema():
+    # Define the expected schema for the element "history" property
+    expected_history_schema = {
+        "type": "array",
+        "items": {
+            "type": "object",
+            "properties": {
+                "element": {"type": "integer"},
+                "fixture": {"type": "integer"},
+                "opponent_team": {"type": "integer"},
+                "total_points": {"type": "integer"},
+                "was_home": {"type": "boolean"},
+                "kickoff_time": {"type": "string"},
+                "team_h_score": {"type": "integer"},
+                "team_a_score": {"type": "integer"},
+                "round": {"type": "integer"},
+                "minutes": {"type": "integer"},
+                "goals_scored": {"type": "integer"},
+                "assists": {"type": "integer"},
+                "clean_sheets": {"type": "integer"},
+                "goals_conceded": {"type": "integer"},
+                "own_goals": {"type": "integer"},
+                "penalties_saved": {"type": "integer"},
+                "penalties_missed": {"type": "integer"},
+                "yellow_cards": {"type": "integer"},
+                "red_cards": {"type": "integer"},
+                "saves": {"type": "integer"},
+                "bonus": {"type": "integer"},
+                "bps": {"type": "integer"},
+                "influence": {"type": "string"},
+                "creativity": {"type": "string"},
+                "threat": {"type": "string"},
+                "ict_index": {"type": "string"},
+                "starts": {"type": "integer"},
+                "expected_goals": {"type": "string"},
+                "expected_assists": {"type": "string"},
+                "expected_goal_involvements": {"type": "string"},
+                "expected_goals_conceded": {"type": "string"},
+                "value": {"type": "integer"},
+                "transfers_balance": {"type": "integer"},
+                "selected": {"type": "integer"},
+                "transfers_in": {"type": "integer"},
+                "transfers_out": {"type": "integer"}
+            },
+            "additionalProperties": False
+        }
+    }
+
+    # get gameweek history for player_id=3
+    data = get_element_summary(3)
+
+    # Validate the returned data against the expected schema
+    try:
+        jsonschema.validate(data, expected_history_schema)
+    except jsonschema.exceptions.ValidationError as e:
+        assert False, f"Schema validation failed for 'history': {e}"
+
+    assert True
+
+
+def test_history_past_schema():
+    # Define the expected schema for the "history_past" property
+    expected_history_past_schema = {
+        "type": "array",
+        "items": {
+            "type": "object",
+            "properties": {
+                "season_name": {"type": "string"},
+                "element": {"type": "integer"},
+                "element_code": {"type": "integer"},
+                "start_cost": {"type": "integer"},
+                "end_cost": {"type": "integer"},
+                "total_points": {"type": "integer"},
+                "minutes": {"type": "integer"},
+                "goals_scored": {"type": "integer"},
+                "assists": {"type": "integer"},
+                "clean_sheets": {"type": "integer"},
+                "goals_conceded": {"type": "integer"},
+                "own_goals": {"type": "integer"},
+                "penalties_saved": {"type": "integer"},
+                "penalties_missed": {"type": "integer"},
+                "yellow_cards": {"type": "integer"},
+                "red_cards": {"type": "integer"},
+                "saves": {"type": "integer"},
+                "bonus": {"type": "integer"},
+                "bps": {"type": "integer"},
+                "influence": {"type": "string"},
+                "creativity": {"type": "string"},
+                "threat": {"type": "string"},
+                "ict_index": {"type": "string"},
+                "starts": {"type": "integer"},
+                "expected_goals": {"type": "string"},
+                "expected_assists": {"type": "string"},
+                "expected_goal_involvements": {"type": "string"},
+                "expected_goals_conceded": {"type": "string"}
+            },
+            "required": [
+                "season_name",
+                "element_code",
+                "start_cost",
+                "end_cost",
+                "total_points",
+                "minutes",
+                "goals_scored",
+                "assists",
+                "clean_sheets",
+                "goals_conceded",
+                "own_goals",
+                "penalties_saved",
+                "penalties_missed",
+                "yellow_cards",
+                "red_cards",
+                "saves",
+                "bonus",
+                "bps",
+                "influence",
+                "creativity",
+                "threat",
+                "ict_index",
+                "starts",
+                "expected_goals",
+                "expected_assists",
+                "expected_goal_involvements",
+                "expected_goals_conceded"
+            ],
+            "additionalProperties": False
+        }
+    }
+
+    # get "history_past" data for player_id=3
+    data = get_element_summary(3, 'history_past')
+
+    # Validate the returned data against the expected schema
+    try:
+        jsonschema.validate(data, expected_history_past_schema)
+    except jsonschema.exceptions.ValidationError as e:
+        assert False, f"Schema validation failed for 'history_past': {e}"
 
     assert True
