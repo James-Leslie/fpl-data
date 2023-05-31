@@ -207,8 +207,8 @@ def test_events_schema():
                     "additionalProperties": False
                 },
                 "transfers_made": {"type": "integer"},
-                "most_captained": {"type": "integer"},
-                "most_vice_captained": {"type": "integer"}
+                "most_captained": {"type": ["integer", "null"]},
+                "most_vice_captained": {"type": ["integer", "null"]}
             },
             "additionalProperties": False
         }
