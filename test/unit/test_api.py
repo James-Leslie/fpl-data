@@ -173,10 +173,10 @@ def test_events_schema():
                 "average_entry_score": {"type": "integer"},
                 "finished": {"type": "boolean"},
                 "data_checked": {"type": "boolean"},
-                "highest_scoring_entry": {"type": "integer"},
+                "highest_scoring_entry": {"type": ["integer", "null"]},
                 "deadline_time_epoch": {"type": "integer"},
                 "deadline_time_game_offset": {"type": "integer"},
-                "highest_score": {"type": "integer"},
+                "highest_score": {"type": ["integer", "null"]},
                 "is_previous": {"type": "boolean"},
                 "is_current": {"type": "boolean"},
                 "is_next": {"type": "boolean"},
@@ -193,11 +193,11 @@ def test_events_schema():
                         "additionalProperties": False
                     }
                 },
-                "most_selected": {"type": "integer"},
-                "most_transferred_in": {"type": "integer"},
-                "top_element": {"type": "integer"},
+                "most_selected": {"type": ["integer", "null"]},
+                "most_transferred_in": {"type": ["integer", "null"]},
+                "top_element": {"type": ["integer", "null"]},
                 "top_element_info": {
-                    "type": "object",
+                    "type": ["object", "null"],
                     "properties": {
                         "id": {"type": "integer"},
                         "points": {"type": "integer"}
@@ -277,18 +277,18 @@ def test_fixtures_schema():
             "type": "object",
             "properties": {
                 "code": {"type": "integer"},
-                "event": {"type": "integer"},
+                "event": {"type": ["integer", "null"]},
                 "finished": {"type": "boolean"},
                 "finished_provisional": {"type": "boolean"},
                 "id": {"type": "integer"},
-                "kickoff_time": {"type": "string"},
+                "kickoff_time": {"type": ["string", "null"]},
                 "minutes": {"type": "integer"},
                 "provisional_start_time": {"type": "boolean"},
-                "started": {"type": "boolean"},
+                "started": {"type": ["boolean", "null"]},
                 "team_a": {"type": "integer"},
-                "team_a_score": {"type": "integer"},
+                "team_a_score": {"type": ["integer", "null"]},
                 "team_h": {"type": "integer"},
-                "team_h_score": {"type": "integer"},
+                "team_h_score": {"type": ["integer", "null"]},
                 "stats": {
                     "type": "array",
                     "items": {
