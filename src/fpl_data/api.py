@@ -32,10 +32,6 @@ class FplApiData:
 
         # fixture data
         fixtures = requests.get(BASE_URL+'fixtures/').json()
-        # # drop unnecessary keys
-        # drop_cols = ['code', 'finished_provisional', 'minutes',
-        #              'provisional_start_time', 'started', 'stats', 'pulse_id']
-        # fixtures = [drop_keys(f, drop_cols) for f in fixtures]
         self.fixtures = fixtures
 
         # Get current season
@@ -44,7 +40,6 @@ class FplApiData:
         year = first_deadline[:4]
         # Calculate the next year
         self.season = f'{year}-{str(int(year) + 1)[-2:]}'
-
 
     def get_all_element_summaries(self):
         '''Get summaries for each element'''
