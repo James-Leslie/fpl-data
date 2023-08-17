@@ -16,7 +16,8 @@ requires-python = ">=3.9"
 dependencies = [
   "tqdm==4.65.0",
   "jsonschema>=4.17.3",
-  "requests>=2.29.0"
+  "requests>=2.29.0",
+  "pandas>=2.0.3"
 ]
 
 [project.urls]

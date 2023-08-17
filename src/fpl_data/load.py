@@ -7,7 +7,7 @@ from fpl_data.utils import drop_keys
 BASE_URL = 'https://fantasy.premierleague.com/api/'
 
 
-class FplApiData:
+class FplApiDataRaw:
 
     def __init__(self):
         '''Downloads all relevant data from FPL API, including:
@@ -18,7 +18,9 @@ class FplApiData:
           - fixtures (schedule)'''
 
         # Bootstrap-static data
+        print('Getting data from API\n...')
         data = requests.get(BASE_URL+'bootstrap-static/').json()
+        print('DONE!\n')
         # delete unnecessary keys
         data = drop_keys(
             data,
@@ -33,13 +35,6 @@ class FplApiData:
         # fixture data
         fixtures = requests.get(BASE_URL+'fixtures/').json()
         self.fixtures = fixtures
-
-        # Get current season
-        first_deadline = self.events[0]['deadline_time']
-        # Extract the year portion from the date string
-        year = first_deadline[:4]
-        # Calculate the next year
-        self.season = f'{year}-{str(int(year) + 1)[-2:]}'
 
     def get_all_element_summaries(self):
         '''Get summaries for each element'''
