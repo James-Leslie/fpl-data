@@ -36,13 +36,6 @@ class FplApiDataRaw:
         fixtures = requests.get(BASE_URL+'fixtures/').json()
         self.fixtures = fixtures
 
-        # Get current season
-        first_deadline = self.events[0]['deadline_time']
-        # Extract the year portion from the date string
-        year = first_deadline[:4]
-        # Calculate the next year
-        self.season = f'{year}-{str(int(year) + 1)[-2:]}'
-
     def get_all_element_summaries(self):
         '''Get summaries for each element'''
         history = []
