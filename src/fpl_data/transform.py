@@ -84,7 +84,9 @@ class FplApiDataTransformed(FplApiDataRaw):
         rename_columns = {
             'id': 'player_id',
             'team': 'team_id',
+            'team_name': 'team',
             'element_type': 'position_id',
+            'pos': 'pos',
             'web_name': 'name',
             'now_cost': '£',
             'starts': 'ST',
@@ -170,7 +172,10 @@ class FplApiDataTransformed(FplApiDataRaw):
         # select only columns of interest
         players = players[
             rename_columns.values()
-        ].set_index(
+        ].drop(
+            ['team_id', 'position_id'],
+            axis=1
+        ).set_index(
             'player_id'
         ).round(1)
 
