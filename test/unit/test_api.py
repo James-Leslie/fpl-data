@@ -1,9 +1,9 @@
 import jsonschema
-from fpl_data.api import FplApiData, get_element_summary
+from fpl_data.load import FplApiDataRaw, get_element_summary
 
 
 # make a request to the FPL API
-api_data = FplApiData()
+api_data = FplApiDataRaw()
 
 
 def test_elements_schema():

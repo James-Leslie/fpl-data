@@ -7,7 +7,7 @@ from fpl_data.utils import drop_keys
 BASE_URL = 'https://fantasy.premierleague.com/api/'
 
 
-class FplApiData:
+class FplApiDataRaw:
 
     def __init__(self):
         '''Downloads all relevant data from FPL API, including:
@@ -18,7 +18,9 @@ class FplApiData:
           - fixtures (schedule)'''
 
         # Bootstrap-static data
+        print('Getting data from API\n...')
         data = requests.get(BASE_URL+'bootstrap-static/').json()
+        print('DONE!\n')
         # delete unnecessary keys
         data = drop_keys(
             data,
