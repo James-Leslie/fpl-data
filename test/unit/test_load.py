@@ -7,7 +7,7 @@ api_data = FplApiDataRaw()
 
 
 def test_elements_schema():
-    data = api_data.elements
+    data = api_data.elements_json
 
     # Define the expected schema for the elements property
     expected_elements_schema = {
@@ -120,7 +120,7 @@ def test_elements_schema():
 
 
 def test_element_types_schema():
-    data = api_data.element_types
+    data = api_data.element_types_json
 
     # Define the expected schema for the element_types property
     expected_element_types_schema = {
@@ -159,7 +159,7 @@ def test_element_types_schema():
 
 
 def test_events_schema():
-    data = api_data.events
+    data = api_data.events_json
 
     # Define the expected schema for the events property
     expected_events_schema = {
@@ -222,7 +222,7 @@ def test_events_schema():
 
 
 def test_teams_schema():
-    data = api_data.teams
+    data = api_data.teams_json
 
     # Define the expected schema for the teams property
     expected_teams_schema = {
@@ -268,7 +268,7 @@ def test_teams_schema():
 
 
 def test_fixtures_schema():
-    data = api_data.fixtures
+    data = api_data.fixtures_json
 
     # Define the expected schema for the fixtures property
     expected_fixtures_schema = {

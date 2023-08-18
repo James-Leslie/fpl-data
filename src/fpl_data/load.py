@@ -27,14 +27,14 @@ class FplApiDataRaw:
             ['element_stats', 'game_settings', 'total_players', 'phases']
         )
 
-        self.elements = data['elements']  # players
-        self.element_types = data['element_types']  # positions
-        self.teams = data['teams']  # teams
-        self.events = data['events']  # game weeks
+        self.elements_json = data['elements']  # players
+        self.element_types_json = data['element_types']  # positions
+        self.teams_json = data['teams']  # teams
+        self.events_json = data['events']  # game weeks
 
         # fixture data
         fixtures = requests.get(BASE_URL+'fixtures/').json()
-        self.fixtures = fixtures
+        self.fixtures_json = fixtures
 
     def get_all_element_summaries(self):
         '''Get summaries for each element'''
@@ -42,7 +42,7 @@ class FplApiDataRaw:
         history_past = []
 
         # get all element_ids from self.elements
-        element_ids = [e['id'] for e in self.elements]
+        element_ids = [e['id'] for e in self.elements_json]
 
         # loop through all element_ids and get summaries
         for element_id in tqdm(element_ids):

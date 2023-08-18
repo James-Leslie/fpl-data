@@ -25,15 +25,15 @@ data = FplApiDataRaw()
 ```
 
 Then, you can access the data using the following attributes:
-  * `elements`: A list of all players in the current season
-  * `element_types`: A list of all positions in the FPL game
-  * `teams`: A list of all teams in the Premier League
-  * `events`: A list of all game weeks in the current season
-  * `fixtures`: A list of all fixtures in the current season
+  * `elements_json`: A list of all players in the current season
+  * `element_types_json`: A list of all positions in the FPL game
+  * `teams_json`: A list of all teams in the Premier League
+  * `events_json`: A list of all game weeks in the current season
+  * `fixtures_json`: A list of all fixtures in the current season
 
 For example, to get the list of all players in the current season, you would do the following:
 ```python
-players = data.elements
+players = data.elements_json
 ```
 
 The `get_element_summary` function can be used to get all past gameweek/season info for a given player_id.
@@ -77,10 +77,10 @@ This module builds on the `load` module, by performing some transformations incl
     - `Pts90`: points scored per 90 minutes
 
 The `FplApiDataTransformed` class can be used to download and transform data from the FPL API, which are then returned as Pandas DataFrames:
-  * `players`: summary of players' season statistics so far
-  * `positions`: all positions in the FPL game
-  * `teams`: summary of teams in the Premier League
-  * `gameweeks`: list of all game weeks in the current season
+  * `players_df`: summary of players' season statistics so far
+  * `positions_df`: all positions in the FPL game
+  * `teams_df`: summary of teams in the Premier League
+  * `gameweeks_df`: list of all game weeks in the current season
 
 To use the `FplApiDataTransformed` class, first create an instance of the class:
 ```python
@@ -94,7 +94,7 @@ Then, you can access the data in DataFrame format using the classes attributes.
 
 For example, to get the main players dataframe, you would do the following:
 ```python
-players = data.players
+players = data.players_df
 ```
 
 ---
