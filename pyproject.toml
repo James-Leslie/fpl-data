@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "FPL-data-loader"
-version = "0.0.8"
+version = "0.0.9"
 description = "Tools for working with Fantasy Premier League data"
 authors = [
   { name="James Leslie", email="contactjamesleslie@gmail.com" },
@@ -17,6 +17,7 @@ dependencies = [
   "tqdm==4.65.0",
   "jsonschema>=4.17.3",
   "requests>=2.29.0",
+  "numpy>=1.25.2",
   "pandas>=2.0.3"
 ]
 

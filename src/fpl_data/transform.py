@@ -1,4 +1,5 @@
 from fpl_data.load import FplApiDataRaw, get_element_summary
+import numpy as np
 import pandas as pd
 
 
@@ -8,7 +9,9 @@ RENAME_COLUMNS = {
     'team_name': 'team',
     'element_type': 'position_id',
     'pos': 'pos',
-    'web_name': 'name',
+    'first_name': 'first_name',
+    'second_name': 'second_name',
+    'web_name': 'player_name',
     'now_cost': '£',
     'starts': 'ST',
     'minutes': 'MP',
@@ -306,6 +309,41 @@ class FplApiDataTransformed(FplApiDataRaw):
                 'event'
             )[[
                 'gw', 'team', 'difficulty'
+            ]].set_index(
+                'gw'
+            )
+
+        if type == 'history':
+            df = df.merge(
+                # get opponent team names
+                self.teams_df['team'],
+                left_on='opponent_team',
+                right_on='team_id'
+            )
+
+            # add opponent column, e.g. BUR (A) or ARS (H)
+            df['was_home'] = df['was_home'].astype('bool')
+            df = df.assign(
+                opponent=lambda x: np.where(
+                    x['was_home'],
+                    f'{x.team[0]} (H)', f'{x.team[0]} (A)'
+                ),
+                score=lambda x: f'{x.team_h_score[0]} - {x.team_a_score[0]}',
+                value=lambda x: np.round(x.value / 10, 1)
+            )
+
+            df = df.rename(columns={
+                'value': '£',
+                'transfers_balance': 'NT',
+                'selected': 'SB'
+            })
+
+            # column ordering
+            df['gw'] = df['round'].astype(int)
+            df = df.sort_values('gw')[[
+                'gw', 'opponent', 'score', 'Pts', 'ST', 'MP', 'GS', 'A', 'xG',
+                'xA', 'xGI', 'CS', 'GC', 'xGC', 'OG', 'PS', 'PM', 'YC', 'RC',
+                'S', 'B', 'BPS', 'I', 'C', 'T', 'II', 'NT', 'SB', '£'
             ]].set_index(
                 'gw'
             )
