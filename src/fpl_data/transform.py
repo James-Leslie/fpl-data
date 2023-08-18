@@ -1,5 +1,57 @@
-from fpl_data.load import FplApiDataRaw
+from fpl_data.load import FplApiDataRaw, get_element_summary
 import pandas as pd
+
+
+RENAME_COLUMNS = {
+    'id': 'player_id',
+    'team': 'team_id',
+    'team_name': 'team',
+    'element_type': 'position_id',
+    'pos': 'pos',
+    'web_name': 'name',
+    'now_cost': '£',
+    'starts': 'ST',
+    'minutes': 'MP',
+    'total_points': 'Pts',
+    'goals_scored': 'GS',
+    'assists': 'A',
+    'GI': 'GI',
+    'expected_goals': 'xG',
+    'expected_assists': 'xA',
+    'expected_goal_involvements': 'xGI',
+    'points_per_game': 'PPG',
+    'Pts90': 'Pts90',
+    'GS90': 'GS90',
+    'A90': 'A90',
+    'GI90': 'GI90',
+    'expected_goals_per_90': 'xG90',
+    'expected_assists_per_90': 'xA90',
+    'expected_goal_involvements_per_90': 'xGI90',
+    'clean_sheets': 'CS',
+    'goals_conceded': 'GC',
+    'expected_goals_conceded': 'xGC',
+    'goals_conceded_per_90': 'GC90',
+    'expected_goals_conceded_per_90': 'xGC90',
+    'own_goals': 'OG',
+    'penalties_saved': 'PS',
+    'penalties_missed': 'PM',
+    'yellow_cards': 'YC',
+    'red_cards': 'RC',
+    'saves': 'S',
+    'saves_per_90': 'S90',
+    'bonus': 'B',
+    'bps': 'BPS',
+    'BPS90': 'BPS90',
+    'influence': 'I',
+    'creativity': 'C',
+    'threat': 'T',
+    'ict_index': 'II',
+    'I90': 'I90',
+    'C90': 'C90',
+    'T90': 'T90',
+    'II90': 'II90',
+    'selected_by_percent': 'TSB%'
+}
 
 
 class FplApiDataTransformed(FplApiDataRaw):
@@ -16,23 +68,23 @@ class FplApiDataTransformed(FplApiDataRaw):
         super().__init__()
 
         # Get current season
-        first_deadline = self.events[0]['deadline_time']
+        first_deadline = self.events_json[0]['deadline_time']
         # Extract the year portion from the date string
         year = first_deadline[:4]
         # Calculate the next year
         self.season = f'{year}-{str(int(year) + 1)[-2:]}'
 
         # Get next gameweek
-        self.next_gw = 1  # default state
-
-        for event in self.events:
+        self.next_gw = 1  # default, to be updated with actual value
+        # search for gameweek with is_next property = true
+        for event in self.events_json:
             if event['is_next']:
                 self.next_gw = event['id']
                 break
 
         # ----------------------------------------------------------- gameweeks
         gameweeks = pd.json_normalize(
-            self.events
+            self.events_json
         ).drop(
             ['chip_plays', 'top_element', 'top_element_info',
              'deadline_time_epoch', 'deadline_time_game_offset',
@@ -51,7 +103,7 @@ class FplApiDataTransformed(FplApiDataRaw):
 
         # ----------------------------------------------------------- positions
         positions = pd.DataFrame(
-            self.element_types
+            self.element_types_json
         ).drop(
             ['plural_name', 'plural_name_short', 'ui_shirt_specific',
              'sub_positions_locked'],
@@ -67,7 +119,7 @@ class FplApiDataTransformed(FplApiDataRaw):
 
         # --------------------------------------------------------------- teams
         teams = pd.DataFrame(
-            self.teams
+            self.teams_json
         ).drop(
             ['code', 'played', 'form', 'win', 'draw', 'loss', 'points',
              'position', 'team_division', 'unavailable', 'pulse_id'],
@@ -81,59 +133,11 @@ class FplApiDataTransformed(FplApiDataRaw):
         )
 
         # ------------------------------------------------------------- players
-        rename_columns = {
-            'id': 'player_id',
-            'team': 'team_id',
-            'team_name': 'team',
-            'element_type': 'position_id',
-            'pos': 'pos',
-            'web_name': 'name',
-            'now_cost': '£',
-            'starts': 'ST',
-            'minutes': 'MP',
-            'total_points': 'Pts',
-            'goals_scored': 'GS',
-            'assists': 'A',
-            'GI': 'GI',
-            'expected_goals': 'xG',
-            'expected_assists': 'xA',
-            'expected_goal_involvements': 'xGI',
-            'points_per_game': 'PPG',
-            'Pts90': 'Pts90',
-            'GS90': 'GS90',
-            'A90': 'A90',
-            'GI90': 'GI90',
-            'expected_goals_per_90': 'xG90',
-            'expected_assists_per_90': 'xA90',
-            'expected_goal_involvements_per_90': 'xGI90',
-            'clean_sheets': 'CS',
-            'goals_conceded': 'GC',
-            'expected_goals_conceded': 'xGC',
-            'goals_conceded_per_90': 'GC90',
-            'expected_goals_conceded_per_90': 'xGC90',
-            'own_goals': 'OG',
-            'penalties_saved': 'PS',
-            'penalties_missed': 'PM',
-            'yellow_cards': 'YC',
-            'red_cards': 'RC',
-            'saves': 'S',
-            'saves_per_90': 'S90',
-            'bonus': 'B',
-            'bps': 'BPS',
-            'BPS90': 'BPS90',
-            'influence': 'I',
-            'creativity': 'C',
-            'threat': 'T',
-            'ict_index': 'II',
-            'II90': 'II90',
-            'selected_by_percent': 'TSB%'
-        }
-
         players = pd.DataFrame(
-            self.elements
+            self.elements_json
         ).rename(
             # rename columns
-            columns=rename_columns
+            columns=RENAME_COLUMNS
         ).astype({
             # change data types
             'PPG': 'float64',
@@ -152,7 +156,7 @@ class FplApiDataTransformed(FplApiDataRaw):
             positions[['pos', 'pos_name_long']], on='position_id'
         )
 
-        # exclude who haven't played any minutes
+        # exclude players who haven't played any minutes
         players = players[players['MP'] > 0]
 
         # calculate additional per 90 stats
@@ -163,7 +167,10 @@ class FplApiDataTransformed(FplApiDataRaw):
             A90=lambda x: x.A / x.MP * 90,
             GI90=lambda x: (x.GS + x.A) / x.MP * 90,
             BPS90=lambda x: x.BPS / x.MP * 90,
-            II90=lambda x: x.II / x.MP * 90,
+            I90=lambda x: x.I / x.MP * 90,
+            C90=lambda x: x.C / x.MP * 90,
+            T90=lambda x: x['T'] / x.MP * 90,
+            II90=lambda x: x.II / x.MP * 90
         )
 
         # convert price to in-game values
@@ -171,7 +178,7 @@ class FplApiDataTransformed(FplApiDataRaw):
 
         # select only columns of interest
         players = players[
-            rename_columns.values()
+            RENAME_COLUMNS.values()
         ].drop(
             ['team_id', 'position_id'],
             axis=1
@@ -179,15 +186,10 @@ class FplApiDataTransformed(FplApiDataRaw):
             'player_id'
         ).round(1)
 
-        self.gameweeks = gameweeks
-        self.teams = teams
-        self.positions = positions
-        self.players = players
-
-        # raw data not needed anymore
-        del self.elements
-        del self.element_types
-        del self.events
+        self.gameweeks_df = gameweeks
+        self.teams_df = teams
+        self.positions_df = positions
+        self.players_df = players
 
     def get_fixtures_matrix(self, start_gw=None, num_gw=8):
         '''Get all fixtures in range (start_gw, end_gw)'''
@@ -198,11 +200,11 @@ class FplApiDataTransformed(FplApiDataRaw):
 
         end_gw = start_gw + num_gw
 
-        team_names = self.teams[['team']]
+        team_names = self.teams_df[['team']]
 
         # create fixtures dataframe
         fixtures = pd.json_normalize(
-            self.fixtures
+            self.fixtures_json
         ).merge(
             # join to team names (home)
             team_names,
@@ -231,9 +233,11 @@ class FplApiDataTransformed(FplApiDataRaw):
 
         # team ids (index) vs fixture difficulty ratings (columns)
         home_ratings = fixtures.pivot(
-            index='team_h', columns='GW', values='team_h_difficulty').fillna(0)
+            index='team_home', columns='GW', values='team_h_difficulty'
+        ).fillna(0)
         away_ratings = fixtures.pivot(
-            index='team_a', columns='GW', values='team_a_difficulty').fillna(0)
+            index='team_away', columns='GW', values='team_a_difficulty'
+        ).fillna(0)
 
         # team names (index) vs opposition team names (columns)
         home_team_names = fixtures.pivot(
@@ -251,6 +255,59 @@ class FplApiDataTransformed(FplApiDataRaw):
         fx_team_names = home_team_names + away_team_names
 
         # change column names
-        fx_team_names.columns = [int(c) for c in fx_team_names.columns]
+        col_names = [int(c) for c in fx_team_names.columns]
+        fx_ratings.columns, fx_team_names.columns = col_names, col_names
 
-        return fx_ratings, fx_team_names
+        # combine team names with FDR
+        fx = fx_team_names + ' ' + fx_ratings.astype(int).astype(str)
+
+        # calculate average FDR per team
+        # ignore 0s (blank fixtures)
+        fx['avg_FDR'] = fx_ratings.replace(0, None).mean(axis=1)
+
+        fx = fx.sort_values(
+            'avg_FDR'
+        ).drop(
+            'avg_FDR', axis=1
+        ).replace(
+            ' 0', ''
+        )
+
+        return fx
+
+    def get_player_summary(self, player_id, type='history'):
+
+        print('Fetching\n...')
+        element_summary = get_element_summary(player_id)
+        print('DONE!\n')
+
+        df = pd.json_normalize(
+            element_summary[type]
+        ).rename(
+            # rename columns
+            columns=RENAME_COLUMNS
+        )
+
+        if type == 'fixtures':
+            df['team_id'] = df.apply(
+                lambda x: x.team_a if x.is_home else x.team_h,
+                axis=1
+            )
+
+            df['gw'] = df['event_name'].apply(
+                lambda x: str(x).split(' ')[-1]
+            )
+
+            # join team names
+            df = df.merge(
+                self.teams_df[['team']],
+                on='team_id'
+            ).sort_values(
+                'event'
+            )[[
+                'gw', 'team', 'difficulty'
+            ]].set_index(
+                'gw'
+            )
+
+        return df
