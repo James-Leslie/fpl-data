@@ -134,6 +134,8 @@ def test_element_types_schema():
                 "singular_name": {"type": "string"},
                 "singular_name_short": {"type": "string"},
                 "squad_select": {"type": "integer"},
+                "squad_min_select": {"type": ["integer", "null"]},
+                "squad_max_select": {"type": ["integer", "null"]},
                 "squad_min_play": {"type": "integer"},
                 "squad_max_play": {"type": "integer"},
                 "ui_shirt_specific": {"type": "boolean"},
@@ -170,6 +172,10 @@ def test_events_schema():
                 "id": {"type": "integer"},
                 "name": {"type": "string"},
                 "deadline_time": {"type": "string", "format": "date-time"},
+                "release_time": {
+                    "type": ["string", "null"],
+                    "format": "date-time"
+                },
                 "average_entry_score": {"type": "integer"},
                 "finished": {"type": "boolean"},
                 "data_checked": {"type": "boolean"},
@@ -182,6 +188,7 @@ def test_events_schema():
                 "is_next": {"type": "boolean"},
                 "cup_leagues_created": {"type": "boolean"},
                 "h2h_ko_matches_created": {"type": "boolean"},
+                "ranked_count": {"type": "integer"},
                 "chip_plays": {
                     "type": "array",
                     "items": {
