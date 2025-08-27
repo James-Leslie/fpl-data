@@ -1,38 +1,25 @@
-[build-system]
-requires = [
-  "setuptools>=67"
-]
-build-backend = "setuptools.build_meta"
-
 [project]
-name = "FPL-data-loader"
-version = "0.2.0"
+name = "fpl-data"
+version = "0.3.0"
 description = "Tools for working with Fantasy Premier League data"
-authors = [
-  { name="James Leslie", email="contactjamesleslie@gmail.com" },
-]
 readme = "README.md"
+authors = [
+    { name = "James Leslie", email = "contactjamesleslie@gmail.com" }
+]
 requires-python = ">=3.9"
 dependencies = [
-  "tqdm>=4.65.0",
-  "jsonschema>=4.17.3",
-  "requests>=2.29.0",
-  "numpy<2",
-  "pandas>=2.0.0",
-  "jinja2>=3.1.4"
+    "jsonschema>=4.25.1",
+    "numpy>=2.0.2",
+    "pandas>=2.3.2",
+    "requests>=2.32.5",
+    "tqdm>=4.67.1",
 ]
 
-[project.urls]
-"Homepage" = "https://github.com/James-Leslie/fpl-data"
-"Bug Tracker" = "https://github.com/James-Leslie/fpl-data/issues"
+[build-system]
+requires = ["uv_build>=0.8.13,<0.9.0"]
+build-backend = "uv_build"
 
-[tool.setuptools]
-# By default, include-package-data is true in pyproject.toml, so you do
-# NOT have to specify this line.
-include-package-data = true
-
-[tool.setuptools.packages.find]
-# scanning for namespace packages is true by default in pyproject.toml, so
-# you do NOT need to include the following line.
-namespaces = true
-where = ["src"]
+[dependency-groups]
+dev = [
+    "ipykernel>=6.30.1",
+]
