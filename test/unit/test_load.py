@@ -32,8 +32,7 @@ def test_elements_schema():
                 "id": {"type": "integer"},
                 "in_dreamteam": {"type": "boolean"},
                 "news": {"type": "string"},
-                "news_added": {
-                    "type": ["string", "null"], "format": "date-time"},
+                "news_added": {"type": ["string", "null"], "format": "date-time"},
                 "now_cost": {"type": "integer"},
                 "photo": {"type": "string"},
                 "points_per_game": {"type": "string"},
@@ -82,8 +81,7 @@ def test_elements_schema():
                 "threat_rank_type": {"type": "integer"},
                 "ict_index_rank": {"type": "integer"},
                 "ict_index_rank_type": {"type": "integer"},
-                "corners_and_indirect_freekicks_order": {
-                    "type": ["integer", "null"]},
+                "corners_and_indirect_freekicks_order": {"type": ["integer", "null"]},
                 "corners_and_indirect_freekicks_text": {"type": "string"},
                 "direct_freekicks_order": {"type": ["integer", "null"]},
                 "direct_freekicks_text": {"type": "string"},
@@ -104,10 +102,10 @@ def test_elements_schema():
                 "selected_rank": {"type": "integer"},
                 "selected_rank_type": {"type": "integer"},
                 "starts_per_90": {"type": "number"},
-                "clean_sheets_per_90": {"type": "number"}
+                "clean_sheets_per_90": {"type": "number"},
             },
-            "additionalProperties": False
-        }
+            "additionalProperties": False,
+        },
     }
 
     # Validate the elements property against the expected schema
@@ -139,16 +137,13 @@ def test_element_types_schema():
                 "squad_min_play": {"type": "integer"},
                 "squad_max_play": {"type": "integer"},
                 "ui_shirt_specific": {"type": "boolean"},
-                "sub_positions_locked": {
-                    "type": "array",
-                    "items": {"type": "integer"}
-                },
-                "element_count": {"type": "integer"}
+                "sub_positions_locked": {"type": "array", "items": {"type": "integer"}},
+                "element_count": {"type": "integer"},
             },
-            "additionalProperties": False
+            "additionalProperties": False,
         },
         "minItems": 4,
-        "maxItems": 4
+        "maxItems": 4,
     }
 
     # Validate the element_types property against the expected schema
@@ -172,10 +167,7 @@ def test_events_schema():
                 "id": {"type": "integer"},
                 "name": {"type": "string"},
                 "deadline_time": {"type": "string", "format": "date-time"},
-                "release_time": {
-                    "type": ["string", "null"],
-                    "format": "date-time"
-                },
+                "release_time": {"type": ["string", "null"], "format": "date-time"},
                 "average_entry_score": {"type": "integer"},
                 "finished": {"type": "boolean"},
                 "data_checked": {"type": "boolean"},
@@ -195,10 +187,10 @@ def test_events_schema():
                         "type": "object",
                         "properties": {
                             "chip_name": {"type": "string"},
-                            "num_played": {"type": "integer"}
+                            "num_played": {"type": "integer"},
                         },
-                        "additionalProperties": False
-                    }
+                        "additionalProperties": False,
+                    },
                 },
                 "most_selected": {"type": ["integer", "null"]},
                 "most_transferred_in": {"type": ["integer", "null"]},
@@ -207,16 +199,16 @@ def test_events_schema():
                     "type": ["object", "null"],
                     "properties": {
                         "id": {"type": "integer"},
-                        "points": {"type": "integer"}
+                        "points": {"type": "integer"},
                     },
-                    "additionalProperties": False
+                    "additionalProperties": False,
                 },
                 "transfers_made": {"type": "integer"},
                 "most_captained": {"type": ["integer", "null"]},
-                "most_vice_captained": {"type": ["integer", "null"]}
+                "most_vice_captained": {"type": ["integer", "null"]},
             },
-            "additionalProperties": False
-        }
+            "additionalProperties": False,
+        },
     }
 
     # Validate the events property against the expected schema
@@ -257,12 +249,12 @@ def test_teams_schema():
                 "strength_attack_away": {"type": "integer"},
                 "strength_defence_home": {"type": "integer"},
                 "strength_defence_away": {"type": "integer"},
-                "pulse_id": {"type": "integer"}
+                "pulse_id": {"type": "integer"},
             },
-            "additionalProperties": False
+            "additionalProperties": False,
         },
         "minItems": 20,
-        "maxItems": 20
+        "maxItems": 20,
     }
 
     # Validate the teams property against the expected schema
@@ -308,11 +300,11 @@ def test_fixtures_schema():
                                     "type": "object",
                                     "properties": {
                                         "value": {"type": "integer"},
-                                        "element": {"type": "integer"}
+                                        "element": {"type": "integer"},
                                     },
                                     "required": ["value", "element"],
-                                    "additionalProperties": False
-                                }
+                                    "additionalProperties": False,
+                                },
                             },
                             "h": {
                                 "type": "array",
@@ -320,23 +312,23 @@ def test_fixtures_schema():
                                     "type": "object",
                                     "properties": {
                                         "value": {"type": "integer"},
-                                        "element": {"type": "integer"}
+                                        "element": {"type": "integer"},
                                     },
                                     "required": ["value", "element"],
-                                    "additionalProperties": False
-                                }
-                            }
+                                    "additionalProperties": False,
+                                },
+                            },
                         },
                         "required": ["identifier", "a", "h"],
-                        "additionalProperties": False
-                    }
+                        "additionalProperties": False,
+                    },
                 },
                 "team_h_difficulty": {"type": "integer"},
                 "team_a_difficulty": {"type": "integer"},
-                "pulse_id": {"type": "integer"}
+                "pulse_id": {"type": "integer"},
             },
-            "additionalProperties": False
-        }
+            "additionalProperties": False,
+        },
     }
 
     # Validate the fixtures property against the expected schema
@@ -394,10 +386,10 @@ def test_element_summary_schema():
                         "transfers_balance": {"type": "integer"},
                         "selected": {"type": "integer"},
                         "transfers_in": {"type": "integer"},
-                        "transfers_out": {"type": "integer"}
+                        "transfers_out": {"type": "integer"},
                     },
-                    "additionalProperties": False
-                }
+                    "additionalProperties": False,
+                },
             },
             "history_past": {
                 "type": "array",
@@ -431,13 +423,13 @@ def test_element_summary_schema():
                         "expected_goals": {"type": "string"},
                         "expected_assists": {"type": "string"},
                         "expected_goal_involvements": {"type": "string"},
-                        "expected_goals_conceded": {"type": "string"}
+                        "expected_goals_conceded": {"type": "string"},
                     },
-                    "additionalProperties": False
-                }
-            }
+                    "additionalProperties": False,
+                },
+            },
         },
-        "additionalProperties": False
+        "additionalProperties": False,
     }
 
     # get "history_past" data for player_id=3
