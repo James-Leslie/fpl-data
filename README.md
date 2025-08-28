@@ -98,26 +98,39 @@ players = data.players_df
 ```
 
 ---
+## Installation
+
+### Using pip (recommended for users)
+```bash
+pip install fpl-data
+```
+
+### Using [UV](https://docs.astral.sh/uv/) (recommended for development)
+```bash
+uv add fpl-data
+```
+
+---
 ## Local development
-If you would like to contribute to this package, you can set up an environment for local development using the following steps:
+If you would like to contribute to this package, you can set up a development environment using [UV](https://docs.astral.sh/uv/):
 
 ### 1. Clone the repository
-https://github.com/James-Leslie/fpl-data
-
-### 2. Make a virtual environment
 ```bash
+git clone https://github.com/James-Leslie/fpl-data
 cd fpl-data
-conda env create -f environment.yml --prefix ./.env
 ```
 
-### 3. Activate your environemt
+### 2. Install dependencies
 ```bash
-conda activate ./.env
+uv sync
 ```
 
-### 4. Create an editable install of the package
+### 3. Run quality checks
 ```bash
-pip install --editable .
+uv run ruff format   # Format code
+uv run ruff check    # Lint code
+uv run mypy src/     # Type checking
+uv run pytest       # Run tests
 ```
 
-### 5. Create a pull request
+### 4. Create a pull request
