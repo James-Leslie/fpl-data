@@ -38,6 +38,12 @@ uv version --bump minor          # Bump minor version
 uv version --bump major          # Bump major version
 ```
 
+## Package Management Rules
+- **ALWAYS use `uv add` and `uv remove` commands for dependency management**
+- **NEVER manually edit pyproject.toml [dependency-groups] or [project.dependencies] sections**
+- Let UV handle version resolution and lockfile updates automatically
+- UV will update `pyproject.toml` and `uv.lock` automatically when adding/removing packages
+
 ## Testing
 - Use `pytest` for testing
 - Write tests in the `test/` directory
