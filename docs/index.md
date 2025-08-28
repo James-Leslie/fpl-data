@@ -40,5 +40,5 @@ print(top_scorers[['web_name', 'team', 'total_points']])
 ## Next Steps
 
 - **[Interactive Notebooks →](https://github.com/James-Leslie/fpl-data/tree/main/notebooks)** - Jupyter tutorials you can run locally
-- **[Examples →](examples.md)** - See real usage with sample outputs
-- **[API Reference →](api.md)** - Complete function and class documentation
+- **[Package API Reference →](api.md)** - Complete function and class documentation
+- **[External FPL API Reference →](fpl-api-reference.md)** - Details on the official FPL API endpoints
