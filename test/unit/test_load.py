@@ -1,6 +1,6 @@
 import jsonschema
-from fpl_data.load import FplApiDataRaw, get_element_summary
 
+from fpl_data.load import FplApiDataRaw, get_element_summary
 
 # make a request to the FPL API
 api_data = FplApiDataRaw()
@@ -115,16 +115,6 @@ def test_elements_schema():
                 "team_join_date": {"type": ["string", "null"]},
                 "clean_sheets_per_90": {"type": "number"},
                 "birth_date": {"type": ["string", "null"]},
-                "can_select": {"type": "boolean"},
-                "can_transact": {"type": "boolean"},
-                "clearances_blocks_interceptions": {"type": "integer"},
-                "defensive_contribution": {"type": "integer"},
-                "defensive_contribution_per_90": {"type": "number"},
-                "has_temporary_code": {"type": "boolean"},
-                "opta_code": {"type": "string"},
-                "recoveries": {"type": "integer"},
-                "removed": {"type": "boolean"},
-                "tackles": {"type": "integer"},
             },
             "additionalProperties": False,
         },
