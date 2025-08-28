@@ -71,6 +71,14 @@ uv version --bump major          # Bump major version
 - Let GitHub Actions handle PyPI publishing
 - Never commit sensitive information (API keys, tokens)
 
+## Commit Guidelines
+- **Make regular, frequent commits** - commit after each logical unit of work
+- **Always commit changes before switching tasks** - ensures work is saved and trackable
+- Use descriptive commit messages that explain the "why" not just the "what"
+- Follow conventional commit format when possible: `type: description`
+- Common commit types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`
+- Include the Claude Code attribution footer for AI-assisted commits
+
 ## Common Tasks & Workflows
 
 ### Starting New Feature
