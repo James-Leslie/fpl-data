@@ -1,6 +1,6 @@
 [project]
 name = "fpl-data"
-version = "0.3.0"
+version = "0.3.1"
 description = "Tools for working with Fantasy Premier League data"
 readme = "README.md"
 authors = [
