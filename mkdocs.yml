@@ -1,0 +1,42 @@
+site_name: FPL Data
+site_description: Python package for loading and transforming data from the Fantasy Premier League API
+site_url: https://james-leslie.github.io/fpl-data/
+repo_url: https://github.com/James-Leslie/fpl-data
+repo_name: James-Leslie/fpl-data
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+    - navigation.top
+    - search.highlight
+    - search.share
+  palette:
+    - scheme: default
+      primary: deep purple
+      accent: purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: deep purple
+      accent: purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+
+nav:
+  - Home: index.md
+  - Examples: examples.md
+  - API Reference: api.md

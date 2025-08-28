@@ -2,11 +2,10 @@
 Python package for loading and transforming data from the Fantasy Premier Leage API.
 
 ## Usage
-For getting raw data in JSON form, use the `fpl_data.load` module.
-
-For getting enriched data as Pandas DataFrames, use the `fpl_data.transform` module.
 
 ### `fpl_data.load`
+For getting raw data in JSON form, use the `fpl_data.load` module.
+
 This module provides a single class: `FplApiDataRaw`
 
 This class can be used to download all relevant data from the FPL API, including:
@@ -69,6 +68,8 @@ The `history` attribute of the summary object will contain a list of dictionarie
 The `history_past` attribute of the summary object will contain a list of dictionaries, each of which representing a summary from a past season.
 
 ### `fpl_data.transform`
+For getting enriched data as Pandas DataFrames, use the `fpl_data.transform` module.
+
 This module builds on the `load` module, by performing some transformations including:
   - Renaming columns to match those shown in the FPL website
   - Correcting data types for some columns
