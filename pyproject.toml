@@ -8,7 +8,6 @@ authors = [
 ]
 requires-python = ">=3.9"
 dependencies = [
-    "jsonschema>=4.25.1",
     "numpy>=2.0.2",
     "pandas>=2.3.2",
     "requests>=2.32.5",
