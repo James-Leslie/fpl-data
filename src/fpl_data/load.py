@@ -2,6 +2,7 @@ import time
 from typing import Any, Dict, List
 
 import requests
+from requests.exceptions import HTTPError, RequestException
 from tqdm.auto import tqdm
 
 from fpl_data.utils import drop_keys
@@ -69,7 +70,7 @@ def get_element_summary(player_id: int) -> Dict[str, Any]:
                 BASE_URL + "element-summary/" + str(player_id) + "/"
             ).json()
             success = True
-        except (requests.exceptions.RequestException, requests.exceptions.HTTPError):
+        except (RequestException, HTTPError):
             # Wait a bit to avoid API rate limits, if needed
             time.sleep(0.3)
 
