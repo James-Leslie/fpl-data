@@ -85,11 +85,10 @@ uv version --bump major          # Bump major version
 1. Create feature branch
 2. Add dependencies: `uv add package-name`
 3. Write code with tests
-4. **Before committing: Run quality checks locally**
-   - Format: `uv run ruff format`
-   - Lint: `uv run ruff check`
-   - Type check: `uv run mypy src/`
-   - Test: `uv run pytest`
+4. **Before committing: Quality checks run automatically via pre-commit**
+   - Pre-commit hooks will automatically run: formatting, linting, type checking, and tests
+   - Manual runs (if needed): `uvx pre-commit run --all-files`
+   - Individual tools: `uvx ruff format`, `uvx ruff check`, `uvx ty check src/`, `uv run pytest`
 5. Commit changes
 
 ### Preparing Release
@@ -113,10 +112,12 @@ uv version --bump major          # Bump major version
 
 ## Quality Gates
 Before any commit:
-- [ ] Code is formatted (`uv run ruff format`)
-- [ ] No linting errors (`uv run ruff check`)
-- [ ] Type checking passes (`uv run mypy src/`)
-- [ ] All tests pass (`uv run pytest`)
+- [ ] Pre-commit hooks pass (runs automatically on `git commit`)
+  - Code formatting (ruff format)
+  - Linting (ruff check --fix)
+  - Type checking (ty check)
+  - Tests (pytest)
+- Manual check: `uvx pre-commit run --all-files`
 
 Before any release:
 - [ ] All quality gates above pass
@@ -124,12 +125,13 @@ Before any release:
 - [ ] README is updated if needed
 
 ## Pre-commit Hooks
-Consider using `pre-commit` to automatically run quality checks before commits:
-- Pre-commit is a framework that manages git hooks
-- Can run ruff, mypy, and pytest automatically before each commit
+Pre-commit automatically runs quality checks before each commit:
+- Framework manages git hooks via `.pre-commit-config.yaml`
+- Uses `uvx` to run tools (ruff, ty, pytest) without dev dependencies
 - Prevents committing code that doesn't meet quality standards
-- Install with `uv add --dev pre-commit` if desired
-- Configure with `.pre-commit-config.yaml` to run quality checks
+- Install hooks: `uvx pre-commit install`
+- Manual run: `uvx pre-commit run --all-files`
+- Skip hooks (emergency): `git commit --no-verify`
 
 ## Development Notes
 - This project avoids traditional Python tools (pip, conda, virtualenv)
