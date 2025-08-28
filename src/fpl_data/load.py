@@ -1,4 +1,5 @@
 import time
+from typing import Any, Dict, List
 
 import requests
 from tqdm.auto import tqdm
@@ -9,7 +10,7 @@ BASE_URL = "https://fantasy.premierleague.com/api/"
 
 
 class FplApiDataRaw:
-    def __init__(self):
+    def __init__(self) -> None:
         """Downloads all relevant data from FPL API, including:
         - elements (players)
         - element_types (positions)
@@ -35,7 +36,7 @@ class FplApiDataRaw:
         fixtures = requests.get(BASE_URL + "fixtures/").json()
         self.fixtures_json = fixtures
 
-    def get_all_element_summaries(self):
+    def get_all_element_summaries(self) -> Dict[str, List[Dict[str, Any]]]:
         """Get summaries for each element"""
         history = []
         history_past = []
@@ -55,7 +56,7 @@ class FplApiDataRaw:
         return all_summaries
 
 
-def get_element_summary(player_id):
+def get_element_summary(player_id: int) -> Dict[str, Any]:
     """Get all past gameweek/season info for a given player_id,
     wait between requests to avoid API rate limit"""
 

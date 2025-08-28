@@ -1,3 +1,5 @@
+from typing import Optional
+
 import pandas as pd
 
 from fpl_data.load import FplApiDataRaw, get_element_summary
@@ -58,7 +60,7 @@ RENAME_COLUMNS = {
 
 
 class FplApiDataTransformed(FplApiDataRaw):
-    def __init__(self):
+    def __init__(self) -> None:
         """Transforms data from FPL API and outputs results as dataframes:
         - players
         - positions
@@ -223,7 +225,9 @@ class FplApiDataTransformed(FplApiDataRaw):
         self.positions_df = positions
         self.players_df = players
 
-    def get_fixtures_matrix(self, start_gw=None, num_gw=8):
+    def get_fixtures_matrix(
+        self, start_gw: Optional[int] = None, num_gw: int = 8
+    ) -> pd.DataFrame:
         """Get all fixtures in range (start_gw, end_gw)"""
 
         # if no start gw provided, use next gameweek
@@ -279,17 +283,17 @@ class FplApiDataTransformed(FplApiDataRaw):
         ).fillna(0)
 
         # team names (index) vs opposition team names (columns)
-        home_team_names = fixtures.pivot(
+        home_team_names_pivot = fixtures.pivot(
             index="team_home", columns="GW", values="team_away"
         )
-        home_team_names = home_team_names.apply(
-            lambda s: s + " (H)" if s is not None else None
+        home_team_names = home_team_names_pivot.apply(
+            lambda s: s + " (H)" if s is not None else None  # type: ignore[operator]
         ).fillna("")
-        away_team_names = fixtures.pivot(
+        away_team_names_pivot = fixtures.pivot(
             index="team_away", columns="GW", values="team_home"
         )
-        away_team_names = away_team_names.apply(
-            lambda s: s + " (A)" if s is not None else None
+        away_team_names = away_team_names_pivot.apply(
+            lambda s: s + " (A)" if s is not None else None  # type: ignore[operator]
         ).fillna("")
 
         fx_ratings = home_ratings + away_ratings
@@ -310,7 +314,7 @@ class FplApiDataTransformed(FplApiDataRaw):
 
         return fx
 
-    def get_player_summary(self, player_id, type="history"):
+    def get_player_summary(self, player_id: int, type: str = "history") -> pd.DataFrame:
         print("Fetching\n...")
         element_summary = get_element_summary(player_id)
         print("DONE!\n")
