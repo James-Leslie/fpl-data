@@ -1,13 +1,13 @@
-name: Publish to PyPI
+name: Deploy to PyPI
 
 on:
   push:
     branches:
-      - '*'
+      - main
 
 jobs:
-  build-package-ubuntu:
-    name: Publish to PyPI
+  deploy:
+    name: Deploy to PyPI
     runs-on: ubuntu-latest
 
     steps:
@@ -33,11 +33,9 @@ jobs:
         run: uv run pytest
       
       - name: Build package
-        if: github.ref == 'refs/heads/main' && success()
         run: uv build
 
       - name: Publish package
-        if: github.ref == 'refs/heads/main' && success()
         uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
         with:
           user: __token__
