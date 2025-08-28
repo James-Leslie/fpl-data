@@ -25,6 +25,7 @@ dev = [
     "ipywidgets>=8.1.7",
     "mypy>=1.17.1",
     "pandas-stubs>=2.2.2.240807",
+    "pydantic>=2.11.7",
     "pytest>=8.4.1",
     "ruff>=0.12.10",
     "types-requests>=2.32.4.20250809",
