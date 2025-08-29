@@ -1,4 +1,4 @@
-from fpl_data.utils import drop_keys
+from fpl_data_loader.utils import drop_keys
 
 
 def test_drop_keys():

@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field, ValidationError
 
-from fpl_data.load import FplApiDataRaw
+from fpl_data_loader.load import FplApiDataRaw
 
 
 class Player(BaseModel):

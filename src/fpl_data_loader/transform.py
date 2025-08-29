@@ -2,7 +2,7 @@ from typing import Optional
 
 import pandas as pd
 
-from fpl_data.load import FplApiDataRaw, get_element_summary
+from fpl_data_loader.load import FplApiDataRaw, get_element_summary
 
 # Column renaming for better readability - using snake_case descriptive names
 RENAME_COLUMNS = {

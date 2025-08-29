@@ -2,7 +2,7 @@
 
 Complete reference for all FPL Data classes and functions.
 
-## `fpl_data.load`
+## `fpl_data_loader.load`
 
 Raw JSON data from the FPL API.
 
@@ -65,7 +65,7 @@ Dictionary with:
 
 ---
 
-## `fpl_data.transform`
+## `fpl_data_loader.transform`
 
 Cleaned pandas DataFrames with enhanced data.
 

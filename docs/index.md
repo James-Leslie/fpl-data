@@ -5,7 +5,7 @@ Python package for loading and transforming Fantasy Premier League API data.
 ## Installation
 
 ```bash
-pip install fpl-data
+pip install FPL-data-loader
 ```
 
 ## Quick Start
@@ -34,8 +34,8 @@ print(top_scorers[['web_name', 'team', 'total_points']])
 
 | Module | Purpose | Returns |
 |--------|---------|---------|
-| `fpl_data.load` | Raw API data | JSON dictionaries |
-| `fpl_data.transform` | Clean data | Pandas DataFrames |
+| `fpl_data_loader.load` | Raw API data | JSON dictionaries |
+| `fpl_data_loader.transform` | Clean data | Pandas DataFrames |
 
 ## Next Steps
 

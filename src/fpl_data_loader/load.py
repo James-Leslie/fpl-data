@@ -5,7 +5,7 @@ import requests
 from requests.exceptions import HTTPError, RequestException
 from tqdm.auto import tqdm
 
-from fpl_data.utils import drop_keys
+from fpl_data_loader.utils import drop_keys
 
 BASE_URL = "https://fantasy.premierleague.com/api/"
 
