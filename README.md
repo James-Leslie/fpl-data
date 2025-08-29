@@ -3,8 +3,8 @@ Python package for loading and transforming data from the Fantasy Premier Leage 
 
 ## Usage
 
-### `fpl_data.load`
-For getting raw data in JSON form, use the `fpl_data.load` module.
+### `fpl_data_loader.load`
+For getting raw data in JSON form, use the `fpl_data_loader.load` module.
 
 This module provides a single class: `FplApiDataRaw`
 
@@ -103,12 +103,12 @@ players = data.players_df
 
 ### Using pip (recommended for users)
 ```bash
-pip install fpl-data
+pip install FPL-data-loader
 ```
 
 ### Using [UV](https://docs.astral.sh/uv/) (recommended for development)
 ```bash
-uv add fpl-data
+uv add FPL-data-loader
 ```
 
 ---

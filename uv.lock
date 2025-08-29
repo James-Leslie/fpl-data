@@ -378,7 +378,7 @@ wheels = [
 ]
 
 [[package]]
-name = "fpl-data"
+name = "fpl-data-loader"
 version = "0.3.2"
 source = { editable = "." }
 dependencies = [
