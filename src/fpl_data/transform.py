@@ -1,64 +1,62 @@
+from typing import Optional
+
 import pandas as pd
 
 from fpl_data.load import FplApiDataRaw, get_element_summary
 
-# rename columns for better readability
+# Column renaming for better readability - using snake_case descriptive names
 RENAME_COLUMNS = {
+    # Player identification
     "id": "player_id",
     "team": "team_id",
-    "team_name": "team",
     "element_type": "position_id",
-    "pos": "pos",
+    "pos": "position",
     "first_name": "first_name",
-    "second_name": "second_name",
+    "second_name": "last_name",
     "web_name": "player_name",
-    "now_cost": "£",
-    "starts": "ST",
-    "minutes": "MP",
-    "total_points": "Pts",
-    "goals_scored": "GS",
-    "assists": "A",
-    "GI": "GI",
-    "expected_goals": "xG",
-    "expected_assists": "xA",
-    "expected_goal_involvements": "xGI",
-    "points_per_game": "PPG",
-    "Pts90": "Pts90",
-    "GS90": "GS90",
-    "A90": "A90",
-    "GI90": "GI90",
-    "expected_goals_per_90": "xG90",
-    "expected_assists_per_90": "xA90",
-    "expected_goal_involvements_per_90": "xGI90",
-    "clean_sheets": "CS",
-    "goals_conceded": "GC",
-    "expected_goals_conceded": "xGC",
-    "goals_conceded_per_90": "GC90",
-    "expected_goals_conceded_per_90": "xGC90",
-    "own_goals": "OG",
-    "penalties_saved": "PS",
-    "penalties_missed": "PM",
-    "yellow_cards": "YC",
-    "red_cards": "RC",
-    "saves": "S",
-    "saves_per_90": "S90",
-    "bonus": "B",
-    "bps": "BPS",
-    "BPS90": "BPS90",
-    "influence": "I",
-    "creativity": "C",
-    "threat": "T",
-    "ict_index": "II",
-    "I90": "I90",
-    "C90": "C90",
-    "T90": "T90",
-    "II90": "II90",
-    "selected_by_percent": "TSB%",
+    "now_cost": "price",
+    # Match stats
+    "starts": "starts",
+    "minutes": "minutes_played",
+    "total_points": "total_points",
+    # Attacking stats
+    "goals_scored": "goals_scored",
+    "assists": "assists",
+    "expected_goals": "expected_goals",
+    "expected_assists": "expected_assists",
+    "expected_goal_involvements": "expected_goal_involvements",
+    "expected_goals_per_90": "expected_goals_per_90",
+    "expected_assists_per_90": "expected_assists_per_90",
+    "expected_goal_involvements_per_90": "expected_goal_involvements_per_90",
+    # Defensive stats
+    "clean_sheets": "clean_sheets",
+    "goals_conceded": "goals_conceded",
+    "expected_goals_conceded": "expected_goals_conceded",
+    "goals_conceded_per_90": "goals_conceded_per_90",
+    "expected_goals_conceded_per_90": "expected_goals_conceded_per_90",
+    "saves": "saves",
+    "saves_per_90": "saves_per_90",
+    # Disciplinary & miscellaneous
+    "own_goals": "own_goals",
+    "penalties_saved": "penalties_saved",
+    "penalties_missed": "penalties_missed",
+    "yellow_cards": "yellow_cards",
+    "red_cards": "red_cards",
+    # Bonus & ICT stats
+    "bonus": "bonus_points",
+    "bps": "bonus_points_system",
+    "influence": "influence",
+    "creativity": "creativity",
+    "threat": "threat",
+    "ict_index": "ict_index",
+    # Other stats
+    "points_per_game": "points_per_game",
+    "selected_by_percent": "selected_by_percent",
 }
 
 
 class FplApiDataTransformed(FplApiDataRaw):
-    def __init__(self):
+    def __init__(self) -> None:
         """Transforms data from FPL API and outputs results as dataframes:
         - players
         - positions
@@ -128,7 +126,7 @@ class FplApiDataTransformed(FplApiDataRaw):
                 columns={
                     "id": "position_id",
                     "singular_name": "pos_name_long",
-                    "singular_name_short": "pos",
+                    "singular_name_short": "position",
                     "element_count": "count",
                 }
             )
@@ -174,46 +172,49 @@ class FplApiDataTransformed(FplApiDataRaw):
             .astype(
                 {
                     # change data types
-                    "PPG": "float64",
-                    "xG": "float64",
-                    "xA": "float64",
-                    "xGI": "float64",
-                    "xGC": "float64",
-                    "I": "float64",
-                    "C": "float64",
-                    "T": "float64",
-                    "II": "float64",
-                    "TSB%": "float64",
+                    "points_per_game": "float64",
+                    "expected_goals": "float64",
+                    "expected_assists": "float64",
+                    "expected_goal_involvements": "float64",
+                    "expected_goals_conceded": "float64",
+                    "influence": "float64",
+                    "creativity": "float64",
+                    "threat": "float64",
+                    "ict_index": "float64",
+                    "selected_by_percent": "float64",
                 }
             )
             .merge(teams[["team", "team_name_long"]], on="team_id")
-            .merge(positions[["pos", "pos_name_long"]], on="position_id")
+            .merge(positions[["position", "pos_name_long"]], on="position_id")
         )
 
         # exclude players who haven't played any minutes
-        players = players[players["MP"] > 0]
+        players = players[players["minutes_played"] > 0]
 
         # calculate additional per 90 stats
         players = players.assign(
-            GI=lambda x: x.GS + x.A,
-            Pts90=lambda x: x.Pts / x.MP * 90,
-            GS90=lambda x: x.GS / x.MP * 90,
-            A90=lambda x: x.A / x.MP * 90,
-            GI90=lambda x: (x.GS + x.A) / x.MP * 90,
-            BPS90=lambda x: x.BPS / x.MP * 90,
-            I90=lambda x: x.I / x.MP * 90,
-            C90=lambda x: x.C / x.MP * 90,
-            T90=lambda x: x["T"] / x.MP * 90,
-            II90=lambda x: x.II / x.MP * 90,
+            goal_involvements=lambda x: x.goals_scored + x.assists,
+            total_points_per_90=lambda x: x.total_points / x.minutes_played * 90,
+            goals_scored_per_90=lambda x: x.goals_scored / x.minutes_played * 90,
+            assists_per_90=lambda x: x.assists / x.minutes_played * 90,
+            goal_involvements_per_90=lambda x: (x.goals_scored + x.assists)
+            / x.minutes_played
+            * 90,
+            bonus_points_system_per_90=lambda x: x.bonus_points_system
+            / x.minutes_played
+            * 90,
+            influence_per_90=lambda x: x.influence / x.minutes_played * 90,
+            creativity_per_90=lambda x: x.creativity / x.minutes_played * 90,
+            threat_per_90=lambda x: x.threat / x.minutes_played * 90,
+            ict_index_per_90=lambda x: x.ict_index / x.minutes_played * 90,
         )
 
         # convert price to in-game values
-        players["£"] = players["£"] / 10
+        players["price"] = players["price"] / 10
 
         # select only columns of interest
         players = (
-            players[RENAME_COLUMNS.values()]
-            .drop(["team_id", "position_id"], axis=1)
+            players.drop(["team_id", "position_id"], axis=1)
             .set_index("player_id")
             .round(1)
         )
@@ -223,7 +224,9 @@ class FplApiDataTransformed(FplApiDataRaw):
         self.positions_df = positions
         self.players_df = players
 
-    def get_fixtures_matrix(self, start_gw=None, num_gw=8):
+    def get_fixtures_matrix(
+        self, start_gw: Optional[int] = None, num_gw: int = 8
+    ) -> pd.DataFrame:
         """Get all fixtures in range (start_gw, end_gw)"""
 
         # if no start gw provided, use next gameweek
@@ -279,17 +282,17 @@ class FplApiDataTransformed(FplApiDataRaw):
         ).fillna(0)
 
         # team names (index) vs opposition team names (columns)
-        home_team_names = fixtures.pivot(
+        home_team_names_pivot = fixtures.pivot(
             index="team_home", columns="GW", values="team_away"
         )
-        home_team_names = home_team_names.apply(
-            lambda s: s + " (H)" if s is not None else None
+        home_team_names = home_team_names_pivot.apply(
+            lambda s: s + " (H)" if s is not None else None  # type: ignore[operator]
         ).fillna("")
-        away_team_names = fixtures.pivot(
+        away_team_names_pivot = fixtures.pivot(
             index="team_away", columns="GW", values="team_home"
         )
-        away_team_names = away_team_names.apply(
-            lambda s: s + " (A)" if s is not None else None
+        away_team_names = away_team_names_pivot.apply(
+            lambda s: s + " (A)" if s is not None else None  # type: ignore[operator]
         ).fillna("")
 
         fx_ratings = home_ratings + away_ratings
@@ -310,7 +313,7 @@ class FplApiDataTransformed(FplApiDataRaw):
 
         return fx
 
-    def get_player_summary(self, player_id, type="history"):
+    def get_player_summary(self, player_id: int, type: str = "history") -> pd.DataFrame:
         print("Fetching\n...")
         element_summary = get_element_summary(player_id)
         print("DONE!\n")
@@ -354,7 +357,11 @@ class FplApiDataTransformed(FplApiDataRaw):
             df["value"] = df["value"] / 10
 
             df = df.rename(
-                columns={"value": "£", "transfers_balance": "NT", "selected": "SB"}
+                columns={
+                    "value": "price",
+                    "transfers_balance": "net_transfers",
+                    "selected": "selected_by",
+                }
             )
 
             # column ordering
@@ -365,45 +372,45 @@ class FplApiDataTransformed(FplApiDataRaw):
                         "gw",
                         "opponent",
                         "score",
-                        "Pts",
-                        "ST",
-                        "MP",
-                        "GS",
-                        "A",
-                        "xG",
-                        "xA",
-                        "xGI",
-                        "CS",
-                        "GC",
-                        "xGC",
-                        "OG",
-                        "PS",
-                        "PM",
-                        "YC",
-                        "RC",
-                        "S",
-                        "B",
-                        "BPS",
-                        "I",
-                        "C",
-                        "T",
-                        "II",
-                        "NT",
-                        "SB",
-                        "£",
+                        "total_points",
+                        "starts",
+                        "minutes_played",
+                        "goals_scored",
+                        "assists",
+                        "expected_goals",
+                        "expected_assists",
+                        "expected_goal_involvements",
+                        "clean_sheets",
+                        "goals_conceded",
+                        "expected_goals_conceded",
+                        "own_goals",
+                        "penalties_saved",
+                        "penalties_missed",
+                        "yellow_cards",
+                        "red_cards",
+                        "saves",
+                        "bonus_points",
+                        "bonus_points_system",
+                        "influence",
+                        "creativity",
+                        "threat",
+                        "ict_index",
+                        "net_transfers",
+                        "selected_by",
+                        "price",
                     ]
                 ]
                 # change data types
                 .astype(
                     {
-                        "xG": "float64",
-                        "xA": "float64",
-                        "xGI": "float64",
-                        "xGC": "float64",
-                        "I": "float64",
-                        "C": "float64",
-                        "T": "float64",
-                        "II": "float64",
+                        "expected_goals": "float64",
+                        "expected_assists": "float64",
+                        "expected_goal_involvements": "float64",
+                        "expected_goals_conceded": "float64",
+                        "influence": "float64",
+                        "creativity": "float64",
+                        "threat": "float64",
+                        "ict_index": "float64",
                     }
                 )
                 .set_index("gw")

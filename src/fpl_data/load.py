@@ -1,6 +1,8 @@
 import time
+from typing import Any, Dict, List
 
 import requests
+from requests.exceptions import HTTPError, RequestException
 from tqdm.auto import tqdm
 
 from fpl_data.utils import drop_keys
@@ -9,7 +11,7 @@ BASE_URL = "https://fantasy.premierleague.com/api/"
 
 
 class FplApiDataRaw:
-    def __init__(self):
+    def __init__(self) -> None:
         """Downloads all relevant data from FPL API, including:
         - elements (players)
         - element_types (positions)
@@ -35,7 +37,7 @@ class FplApiDataRaw:
         fixtures = requests.get(BASE_URL + "fixtures/").json()
         self.fixtures_json = fixtures
 
-    def get_all_element_summaries(self):
+    def get_all_element_summaries(self) -> Dict[str, List[Dict[str, Any]]]:
         """Get summaries for each element"""
         history = []
         history_past = []
@@ -55,7 +57,7 @@ class FplApiDataRaw:
         return all_summaries
 
 
-def get_element_summary(player_id):
+def get_element_summary(player_id: int) -> Dict[str, Any]:
     """Get all past gameweek/season info for a given player_id,
     wait between requests to avoid API rate limit"""
 
@@ -68,7 +70,7 @@ def get_element_summary(player_id):
                 BASE_URL + "element-summary/" + str(player_id) + "/"
             ).json()
             success = True
-        except (requests.exceptions.RequestException, requests.exceptions.HTTPError):
+        except (RequestException, HTTPError):
             # Wait a bit to avoid API rate limits, if needed
             time.sleep(0.3)
 

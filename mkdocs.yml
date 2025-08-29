@@ -1,0 +1,13 @@
+site_name: FPL Data
+site_description: Python package for loading and transforming data from the Fantasy Premier League API
+site_url: https://james-leslie.github.io/fpl-data/
+repo_url: https://github.com/James-Leslie/fpl-data
+repo_name: James-Leslie/fpl-data
+
+nav:
+  - Home: index.md
+  - API Reference: api.md
+  - External Data Sources:
+      - FPL API Reference: fpl-api-reference.md
+
+theme: readthedocs
