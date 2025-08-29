@@ -1,5 +1,5 @@
 [project]
-name = "fpl-data"
+name = "FPL-data-loader"
 version = "0.3.2"
 description = "Tools for working with Fantasy Premier League data"
 readme = "README.md"
