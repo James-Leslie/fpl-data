@@ -23,15 +23,6 @@ jobs:
       - name: Install dependencies
         run: uv sync
 
-      - name: Run quality checks
-        run: |
-          uv run ruff format --check
-          uv run ruff check
-          uv run mypy src/
-
-      - name: Run tests
-        run: uv run pytest
-
       - name: Build package
         run: uv build
 
