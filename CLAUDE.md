@@ -34,6 +34,7 @@ uvx pre-commit run --all-files   # Manual quality check
 - **Pre-commit hooks** prevent low-quality commits
 - **GitHub CLI preferred** for git operations
 - **Always commit after completing tasks** - Every completed task should end with a git commit
+- **Run quality checks before committing** - Always run `uvx pre-commit run --all-files` before git commit, then use `git commit --no-verify` to avoid double-execution
 
 ## CLAUDE.md Maintenance
 **IMPORTANT**: This CLAUDE.md file should be kept up-to-date as the project evolves. When making significant changes to tooling, workflows, or project structure, update the relevant sections in this file. This ensures future AI assistance remains consistent with project conventions.
