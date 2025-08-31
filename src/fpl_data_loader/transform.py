@@ -136,6 +136,42 @@ class FplDataTransformer(FplDataLoader):
 
         return positions
 
+    def _calculate_expected_points(self, df: pd.DataFrame) -> pd.Series:
+        """Calculate expected FPL points based on underlying stats and position.
+
+        Args:
+            df: DataFrame with player data including position_id and expected stats
+
+        Returns:
+            Series of expected points per player
+        """
+        # Position-specific goal points
+        goal_points = df.position_id.map({1: 6, 2: 6, 3: 5, 4: 4})  # GKP/DEF/MID/FWD
+
+        # Calculate components
+        expected_goal_points = df.expected_goals * goal_points
+        expected_assist_points = df.expected_assists * 3
+
+        # Clean sheet probability and points (only if 60+ minutes)
+        clean_sheet_prob = 1 / (1 + df.expected_goals_conceded)
+        clean_sheet_points = df.position_id.map({1: 4, 2: 4, 3: 1, 4: 0})
+        minutes_60_plus = (df.minutes_played >= 60).astype(int)
+        expected_clean_sheet_points = (
+            clean_sheet_prob * clean_sheet_points * minutes_60_plus
+        )
+
+        # Minutes points: 1pt for playing, +1pt for 60+ minutes
+        minutes_points = (df.minutes_played > 0).astype(int) + (
+            df.minutes_played >= 60
+        ).astype(int)
+
+        return (
+            expected_goal_points
+            + expected_assist_points
+            + expected_clean_sheet_points
+            + minutes_points
+        )
+
     def _transform_players(self) -> pd.DataFrame:
         """Transform players data into a clean DataFrame."""
 
@@ -195,6 +231,9 @@ class FplDataTransformer(FplDataLoader):
             )
         )
 
+        # Add expected points using dedicated calculation method
+        players["expected_points"] = self._calculate_expected_points(players)
+
         # calculate additional per 90 stats
         players = players.assign(
             goal_involvements=lambda x: x.goals_scored + x.assists,
@@ -204,6 +243,7 @@ class FplDataTransformer(FplDataLoader):
             goal_involvements_per_90=lambda x: (x.goals_scored + x.assists)
             / x.minutes_played
             * 90,
+            expected_points_per_90=lambda x: x.expected_points / x.minutes_played * 90,
             bps_per_90=lambda x: x.bps / x.minutes_played * 90,
             influence_per_90=lambda x: x.influence / x.minutes_played * 90,
             creativity_per_90=lambda x: x.creativity / x.minutes_played * 90,
