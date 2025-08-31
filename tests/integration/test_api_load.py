@@ -5,8 +5,8 @@ from pydantic import BaseModel, Field, ValidationError
 from fpl_data_loader.load import FplApiDataRaw
 
 
-class Player(BaseModel):
-    """Pydantic model for FPL API player data (elements)"""
+class Element(BaseModel):
+    """Pydantic model for FPL API element data (players)"""
 
     # Core identifiers
     id: int
@@ -190,23 +190,23 @@ class Team(BaseModel):
     pulse_id: int
 
 
-def test_players():
-    """Test that all current players validate against Pydantic model"""
+def test_elements():
+    """Test that all current elements validate against Pydantic model"""
     data = FplApiDataRaw()
 
     try:
-        players = [Player.model_validate(p) for p in data.elements_json]
-        print(f"Successfully validated {len(players)} players")
+        elements = [Element.model_validate(e) for e in data.elements_json]
+        print(f"Successfully validated {len(elements)} elements")
 
         # Basic sanity checks
-        assert len(players) > 700, f"Expected >700 players, got {len(players)}"
+        assert len(elements) > 700, f"Expected >700 elements, got {len(elements)}"
 
-        # Check we have players from all positions
-        positions = {p.element_type for p in players}
+        # Check we have elements from all positions
+        positions = {e.element_type for e in elements}
         assert positions == {1, 2, 3, 4}, f"Missing positions: {positions}"
 
         # Check we have reasonable cost distribution
-        costs = [p.now_cost for p in players]
+        costs = [e.now_cost for e in elements]
         assert min(costs) >= 35, f"Minimum cost too low: {min(costs)}"  # £3.5m
         assert max(costs) <= 150, f"Maximum cost too high: {max(costs)}"  # £15.0m
 
