@@ -24,9 +24,7 @@ uvx pre-commit run --all-files   # Manual quality check
 
   > Always use `uv` for dependency management (never edit pyproject.toml manually)
 
-# Workflows
-
-## Collaborative Development Workflow
+# Collaborative Development Workflow
 1. **Plan & Track**: Use TodoWrite tool for multi-step tasks
 2. **Iterative Development**: 
    - User requests changes/improvements
@@ -37,6 +35,9 @@ uvx pre-commit run --all-files   # Manual quality check
    - Run `uvx pre-commit run --all-files`
    - Fix any issues that arise
    - Create descriptive git commit
+4. **Assessment**: After completing implementation, assess if updates needed to:
+   - Tests (unit/integration coverage)
+   - MkDocs documentation
+   - README file
+   - CLAUDE.md (this file)
 
-## CLAUDE.md Maintenance
-**IMPORTANT**: This CLAUDE.md file should be kept up-to-date as the project evolves. When making significant changes to tooling, workflows, or project structure, update the relevant sections in this file. This ensures future AI assistance remains consistent with project conventions.
