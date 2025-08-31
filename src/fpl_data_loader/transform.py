@@ -2,38 +2,37 @@ from typing import Optional
 
 import pandas as pd
 
-from fpl_data_loader.load import FplApiDataRaw, get_element_summary
+from fpl_data_loader.load import FplDataLoader, get_element_summary
 
 
-class FplDataTransformer(FplApiDataRaw):
-    """Data transformer for FPL API data.
+class FplDataTransformer(FplDataLoader):
+    """Transforms data from FPL API and outputs results as dataframes:
 
     Transforms raw FPL API data into clean pandas DataFrames with user-friendly
     column names. Supports both compact mode (essential columns) and full mode
     (all useful columns) for different use cases.
     """
 
-    def __init__(self, compact: bool = True) -> None:
+    def __init__(self) -> None:
         """Initialize transformer and create clean DataFrames.
 
         Args:
             compact (bool): If True, return only essential columns for fantasy analysis.
-                            If False, return all useful columns for detailed analysis.
+                          If False, return all useful columns for detailed analysis.
         """
 
-        # Initialize base class - download raw data from FPL API
+        # Download raw data
         super().__init__()
-        self.compact = compact
-
-        # Transform all data types
-        self.players_df = self._transform_players()
-        self.teams_df = self._transform_teams()
-        self.positions_df = self._transform_positions()
-        self.gameweeks_df = self._transform_gameweeks()
 
         # Calculate current season and next gameweek
         self.season = self._get_current_season()
         self.next_gw = self._get_next_gameweek()
+
+        # Transform all data types
+        self.gameweeks_df = self._transform_gameweeks()
+        self.teams_df = self._transform_teams()
+        self.positions_df = self._transform_positions()
+        self.players_df = self._transform_players()
 
     def _get_current_season(self) -> str:
         """Extract current season from first gameweek deadline."""
@@ -47,6 +46,182 @@ class FplDataTransformer(FplApiDataRaw):
             if event["is_next"]:
                 return event["id"]
         return 1
+
+    def _transform_gameweeks(self) -> pd.DataFrame:
+        """Transform gameweeks data into a clean DataFrame."""
+        gameweeks = (
+            pd.json_normalize(self.events_json)
+            .drop(
+                [
+                    "chip_plays",
+                    "top_element",
+                    "top_element_info",
+                    "deadline_time_epoch",
+                    "deadline_time_game_offset",
+                    "cup_leagues_created",
+                    "h2h_ko_matches_created",
+                ],
+                axis=1,
+            )
+            .rename(
+                columns={
+                    "id": "gameweek",
+                    "average_entry_score": "average_manager_points",
+                    "highest_scoring_entry": "top_manager_id",
+                    "highest_score": "top_manager_score",
+                    "top_element_info.id": "top_player_id",
+                    "top_element_info.points": "top_player_points",
+                }
+            )
+            .set_index("gameweek")
+        )
+
+        return gameweeks
+
+    def _transform_teams(self) -> pd.DataFrame:
+        """Transform teams data into a clean DataFrame."""
+        teams = (
+            pd.DataFrame(self.teams_json)
+            .drop(
+                [
+                    "code",
+                    "played",
+                    "form",
+                    "win",
+                    "draw",
+                    "loss",
+                    "points",
+                    "position",
+                    "team_division",
+                    "unavailable",
+                    "pulse_id",
+                ],
+                axis=1,
+            )
+            .rename(
+                columns={
+                    "id": "team_id",
+                    "short_name": "team",
+                    "name": "team_name_long",
+                }
+            )
+            .set_index("team_id")
+        )
+
+        return teams
+
+    def _transform_positions(self) -> pd.DataFrame:
+        """Transform positions data into a clean DataFrame."""
+        positions = (
+            pd.DataFrame(self.element_types_json)
+            .drop(
+                [
+                    "plural_name",
+                    "plural_name_short",
+                    "ui_shirt_specific",
+                    "sub_positions_locked",
+                ],
+                axis=1,
+            )
+            .rename(
+                columns={
+                    "id": "position_id",
+                    "singular_name": "position_name_long",
+                    "singular_name_short": "position",
+                    "element_count": "count",
+                }
+            )
+            .set_index("position_id")
+        )
+
+        return positions
+
+    def _transform_players(self) -> pd.DataFrame:
+        """Transform players data into a clean DataFrame."""
+
+        players = (
+            pd.DataFrame(self.elements_json)
+            # Exclude players who haven't played any minutes and can_select is True
+            .query("minutes > 0 and can_select")
+            # Rename columns for clarity
+            .rename(
+                columns={
+                    "id": "player_id",
+                    "team": "team_id",
+                    "element_type": "position_id",
+                    "second_name": "last_name",
+                    "web_name": "short_name",
+                    "now_cost": "price",
+                    "minutes": "minutes_played",
+                }
+            )
+            # Drop columns that are not needed
+            .drop(
+                columns=[
+                    "can_transact",
+                    "can_select",
+                    "code",
+                    "photo",
+                    "removed",
+                    "squad_number",
+                    "status",
+                    "team_code",
+                    "region",
+                    "team_join_date",
+                    "birth_date",
+                    "has_temporary_code",
+                    "opta_code",
+                ]
+            )
+            .astype(
+                {
+                    # change data types
+                    "points_per_game": "float64",
+                    "expected_goals": "float64",
+                    "expected_assists": "float64",
+                    "expected_goal_involvements": "float64",
+                    "expected_goals_conceded": "float64",
+                    "influence": "float64",
+                    "creativity": "float64",
+                    "threat": "float64",
+                    "ict_index": "float64",
+                    "selected_by_percent": "float64",
+                }
+            )
+            # Merge with teams and positions data
+            .merge(self.teams_df[["team", "team_name_long"]], on="team_id")
+            .merge(
+                self.positions_df[["position", "position_name_long"]], on="position_id"
+            )
+        )
+
+        # calculate additional per 90 stats
+        players = players.assign(
+            goal_involvements=lambda x: x.goals_scored + x.assists,
+            total_points_per_90=lambda x: x.total_points / x.minutes_played * 90,
+            goals_scored_per_90=lambda x: x.goals_scored / x.minutes_played * 90,
+            assists_per_90=lambda x: x.assists / x.minutes_played * 90,
+            goal_involvements_per_90=lambda x: (x.goals_scored + x.assists)
+            / x.minutes_played
+            * 90,
+            bps_per_90=lambda x: x.bps / x.minutes_played * 90,
+            influence_per_90=lambda x: x.influence / x.minutes_played * 90,
+            creativity_per_90=lambda x: x.creativity / x.minutes_played * 90,
+            threat_per_90=lambda x: x.threat / x.minutes_played * 90,
+            ict_index_per_90=lambda x: x.ict_index / x.minutes_played * 90,
+        )
+
+        # convert price to in-game values
+        players["price"] = players["price"] / 10
+
+        # select only columns of interest
+        players = (
+            players.drop(["team_id", "position_id"], axis=1)
+            .set_index("player_id")
+            .round(1)
+        )
+
+        return players
 
     def get_fixtures_matrix(
         self, start_gw: Optional[int] = None, num_gw: int = 8
@@ -142,18 +317,7 @@ class FplDataTransformer(FplApiDataRaw):
         element_summary = get_element_summary(player_id)
         print("DONE!\n")
 
-        renames = {
-            "id": "player_id",
-            "team": "team_id",
-            "element_type": "position_id",
-            "second_name": "last_name",
-            "web_name": "player_name",
-            "now_cost": "price",
-            "minutes": "minutes_played",
-            "bonus": "bonus_points",
-            "bps": "bonus_points_system",
-        }
-        df = pd.json_normalize(element_summary[type]).rename(columns=renames)
+        df = pd.json_normalize(element_summary[type])
 
         if type == "fixtures":
             df["team_id"] = df.apply(
@@ -206,7 +370,7 @@ class FplDataTransformer(FplApiDataRaw):
                         "score",
                         "total_points",
                         "starts",
-                        "minutes_played",
+                        "minutes",
                         "goals_scored",
                         "assists",
                         "expected_goals",
@@ -221,8 +385,8 @@ class FplDataTransformer(FplApiDataRaw):
                         "yellow_cards",
                         "red_cards",
                         "saves",
-                        "bonus_points",
-                        "bonus_points_system",
+                        "bonus",
+                        "bps",
                         "influence",
                         "creativity",
                         "threat",

@@ -2,7 +2,7 @@ from typing import List, Optional
 
 from pydantic import BaseModel, Field, ValidationError
 
-from fpl_data_loader.load import FplApiDataRaw
+from fpl_data_loader.load import FplDataLoader
 
 
 class Element(BaseModel):
@@ -194,7 +194,7 @@ class Team(BaseModel):
 
 def test_elements():
     """Test that all current elements validate against Pydantic model"""
-    data = FplApiDataRaw()
+    data = FplDataLoader()
 
     try:
         elements = [Element.model_validate(e) for e in data.elements_json]
@@ -224,7 +224,7 @@ def test_elements():
 
 def test_element_types():
     """Test that position data validates against Pydantic model"""
-    data = FplApiDataRaw()
+    data = FplDataLoader()
 
     try:
         element_types = [
@@ -250,7 +250,7 @@ def test_element_types():
 
 def test_teams():
     """Test that team data validates against Pydantic model"""
-    data = FplApiDataRaw()
+    data = FplDataLoader()
 
     try:
         teams = [Team.model_validate(t) for t in data.teams_json]

@@ -2,10 +2,10 @@ from typing import Optional, Set
 
 import pandas as pd
 
-from fpl_data_loader.load import FplApiDataRaw
+from fpl_data_loader.load import FplDataLoader
 
 
-class FplDataTransformer(FplApiDataRaw):
+class FplDataTransformer(FplDataLoader):
     """Clean, maintainable FPL data transformer with compact/full modes.
 
     Transforms raw FPL API data into clean pandas DataFrames with user-friendly
@@ -58,20 +58,19 @@ class FplDataTransformer(FplApiDataRaw):
         Returns:
             Cleaned DataFrame with appropriate columns
         """
-        # Column renames (only actual renames, no identity mappings)
+        # Column renames
         renames = {
             "id": "player_id",
             "team": "team_id",
             "element_type": "position_id",
             "second_name": "last_name",
-            "web_name": "player_name",
+            "web_name": "short_name",
             "now_cost": "price",
             "minutes": "minutes_played",
             "bonus": "bonus_points",
-            "bps": "bonus_points_system",
         }
 
-        # Columns to always exclude (known to be useless)
+        # Columns to always exclude
         exclude_cols = {
             "code",
             "pulse_id",
@@ -280,3 +279,92 @@ class FplDataTransformer(FplApiDataRaw):
             )
 
         return df.round(1)
+
+    def get_fixtures_matrix(
+        self, start_gw: Optional[int] = None, num_gw: int = 8
+    ) -> pd.DataFrame:
+        """Get all fixtures in range (start_gw, end_gw)"""
+
+        # if no start gw provided, use next gameweek
+        if not start_gw:
+            start_gw = self.next_gw
+
+        end_gw = start_gw + num_gw
+
+        team_names = self.teams_df[["team"]]
+
+        # create fixtures dataframe
+        fixtures = (
+            pd.json_normalize(self.fixtures_json)
+            .merge(
+                # join to team names (home)
+                team_names,
+                left_on="team_h",
+                right_on="team_id",
+                suffixes=[None, "_home"],
+            )
+            .merge(
+                # join to team names (away)
+                team_names,
+                left_on="team_a",
+                right_on="team_id",
+                suffixes=[None, "_away"],
+            )
+            .rename(columns={"id": "fixture_id", "event": "GW", "team": "team_home"})
+            .drop(
+                [
+                    "code",
+                    "finished_provisional",
+                    "kickoff_time",
+                    "minutes",
+                    "provisional_start_time",
+                    "started",
+                    "stats",
+                    "pulse_id",
+                ],
+                axis=1,
+            )
+        )
+
+        # filter between start_gw and end_gw
+        fixtures = fixtures[(fixtures["GW"] >= start_gw) & (fixtures["GW"] <= end_gw)]
+
+        # team ids (index) vs fixture difficulty ratings (columns)
+        home_ratings = fixtures.pivot(
+            index="team_home", columns="GW", values="team_h_difficulty"
+        ).fillna(0)
+        away_ratings = fixtures.pivot(
+            index="team_away", columns="GW", values="team_a_difficulty"
+        ).fillna(0)
+
+        # team names (index) vs opposition team names (columns)
+        home_team_names_pivot = fixtures.pivot(
+            index="team_home", columns="GW", values="team_away"
+        )
+        home_team_names = home_team_names_pivot.apply(
+            lambda s: s + " (H)" if s is not None else None  # type: ignore[operator]
+        ).fillna("")
+        away_team_names_pivot = fixtures.pivot(
+            index="team_away", columns="GW", values="team_home"
+        )
+        away_team_names = away_team_names_pivot.apply(
+            lambda s: s + " (A)" if s is not None else None  # type: ignore[operator]
+        ).fillna("")
+
+        fx_ratings = home_ratings + away_ratings
+        fx_team_names = home_team_names + away_team_names
+
+        # change column names
+        col_names = [int(c) for c in fx_team_names.columns]
+        fx_ratings.columns, fx_team_names.columns = col_names, col_names
+
+        # combine team names with FDR
+        fx = fx_team_names + " " + fx_ratings.astype(int).astype(str)
+
+        # calculate average FDR per team
+        # ignore 0s (blank fixtures)
+        fx["avg_FDR"] = fx_ratings.replace(0, None).mean(axis=1)
+
+        fx = fx.sort_values("avg_FDR").drop("avg_FDR", axis=1).replace(" 0", "")
+
+        return fx

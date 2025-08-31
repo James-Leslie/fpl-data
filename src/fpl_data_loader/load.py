@@ -10,7 +10,7 @@ from fpl_data_loader.utils import drop_keys
 BASE_URL = "https://fantasy.premierleague.com/api/"
 
 
-class FplApiDataRaw:
+class FplDataLoader:
     """Raw data loader for Fantasy Premier League API.
 
     This class fetches and stores raw data from the FPL API endpoints,
