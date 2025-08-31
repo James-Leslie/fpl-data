@@ -8,6 +8,8 @@ from fpl_data_loader.load import FplApiDataRaw
 class Element(BaseModel):
     """Pydantic model for FPL API element data (players)"""
 
+    model_config = {"extra": "forbid"}
+
     # Core identifiers
     id: int
     code: int
