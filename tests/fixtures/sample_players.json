@@ -1,0 +1,36 @@
+[
+  {
+    "id": 1,
+    "first_name": "Aaron",
+    "second_name": "Ramsdale", 
+    "web_name": "Ramsdale",
+    "team": 1,
+    "element_type": 1,
+    "now_cost": 45,
+    "total_points": 85,
+    "minutes": 1890,
+    "goals_scored": 0,
+    "assists": 1,
+    "clean_sheets": 8,
+    "expected_goals": "0.1",
+    "expected_assists": "0.8",
+    "points_per_game": "4.5"
+  },
+  {
+    "id": 15,
+    "first_name": "Gabriel",
+    "second_name": "Jesus",
+    "web_name": "Gabriel Jesus",
+    "team": 1, 
+    "element_type": 4,
+    "now_cost": 82,
+    "total_points": 156,
+    "minutes": 2340,
+    "goals_scored": 12,
+    "assists": 8,
+    "clean_sheets": 0,
+    "expected_goals": "10.2",
+    "expected_assists": "6.4",
+    "points_per_game": "6.5"
+  }
+]

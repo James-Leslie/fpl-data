@@ -4,225 +4,49 @@ import pandas as pd
 
 from fpl_data_loader.load import FplApiDataRaw, get_element_summary
 
-# Column renaming for better readability - using snake_case descriptive names
-RENAME_COLUMNS = {
-    # Player identification
-    "id": "player_id",
-    "team": "team_id",
-    "element_type": "position_id",
-    "pos": "position",
-    "first_name": "first_name",
-    "second_name": "last_name",
-    "web_name": "player_name",
-    "now_cost": "price",
-    # Match stats
-    "starts": "starts",
-    "minutes": "minutes_played",
-    "total_points": "total_points",
-    # Attacking stats
-    "goals_scored": "goals_scored",
-    "assists": "assists",
-    "expected_goals": "expected_goals",
-    "expected_assists": "expected_assists",
-    "expected_goal_involvements": "expected_goal_involvements",
-    "expected_goals_per_90": "expected_goals_per_90",
-    "expected_assists_per_90": "expected_assists_per_90",
-    "expected_goal_involvements_per_90": "expected_goal_involvements_per_90",
-    # Defensive stats
-    "clean_sheets": "clean_sheets",
-    "goals_conceded": "goals_conceded",
-    "expected_goals_conceded": "expected_goals_conceded",
-    "goals_conceded_per_90": "goals_conceded_per_90",
-    "expected_goals_conceded_per_90": "expected_goals_conceded_per_90",
-    "saves": "saves",
-    "saves_per_90": "saves_per_90",
-    # Disciplinary & miscellaneous
-    "own_goals": "own_goals",
-    "penalties_saved": "penalties_saved",
-    "penalties_missed": "penalties_missed",
-    "yellow_cards": "yellow_cards",
-    "red_cards": "red_cards",
-    # Bonus & ICT stats
-    "bonus": "bonus_points",
-    "bps": "bonus_points_system",
-    "influence": "influence",
-    "creativity": "creativity",
-    "threat": "threat",
-    "ict_index": "ict_index",
-    # Other stats
-    "points_per_game": "points_per_game",
-    "selected_by_percent": "selected_by_percent",
-}
 
+class FplDataTransformer(FplApiDataRaw):
+    """Data transformer for FPL API data.
 
-class FplApiDataTransformed(FplApiDataRaw):
-    def __init__(self) -> None:
-        """Transforms data from FPL API and outputs results as dataframes:
-        - players
-        - positions
-        - teams
-        - gameweeks
-        - fixtures (schedule)"""
+    Transforms raw FPL API data into clean pandas DataFrames with user-friendly
+    column names. Supports both compact mode (essential columns) and full mode
+    (all useful columns) for different use cases.
+    """
 
-        # Download raw data
+    def __init__(self, compact: bool = True) -> None:
+        """Initialize transformer and create clean DataFrames.
+
+        Args:
+            compact (bool): If True, return only essential columns for fantasy analysis.
+                            If False, return all useful columns for detailed analysis.
+        """
+
+        # Initialize base class - download raw data from FPL API
         super().__init__()
+        self.compact = compact
 
-        # Get current season
+        # Transform all data types
+        self.players_df = self._transform_players()
+        self.teams_df = self._transform_teams()
+        self.positions_df = self._transform_positions()
+        self.gameweeks_df = self._transform_gameweeks()
+
+        # Calculate current season and next gameweek
+        self.season = self._get_current_season()
+        self.next_gw = self._get_next_gameweek()
+
+    def _get_current_season(self) -> str:
+        """Extract current season from first gameweek deadline."""
         first_deadline = self.events_json[0]["deadline_time"]
-        # Extract the year portion from the date string
         year = first_deadline[:4]
-        # Calculate the next year
-        self.season = f"{year}-{str(int(year) + 1)[-2:]}"
+        return f"{year}-{str(int(year) + 1)[-2:]}"
 
-        # Get next gameweek
-        self.next_gw = 1  # default, to be updated with actual value
-        # search for gameweek with is_next property = true
+    def _get_next_gameweek(self) -> int:
+        """Find the next upcoming gameweek."""
         for event in self.events_json:
             if event["is_next"]:
-                self.next_gw = event["id"]
-                break
-
-        # ----------------------------------------------------------- gameweeks
-        gameweeks = (
-            pd.json_normalize(self.events_json)
-            .drop(
-                [
-                    "chip_plays",
-                    "top_element",
-                    "top_element_info",
-                    "deadline_time_epoch",
-                    "deadline_time_game_offset",
-                    "cup_leagues_created",
-                    "h2h_ko_matches_created",
-                ],
-                axis=1,
-            )
-            .rename(
-                columns={
-                    "id": "GW",
-                    "average_entry_score": "average_manager_points",
-                    "highest_scoring_entry": "top_manager_id",
-                    "highest_score": "top_manager_score",
-                    "top_element_info.id": "top_player_id",
-                    "top_element_info.points": "top_player_points",
-                }
-            )
-            .set_index("GW")
-        )
-
-        # ----------------------------------------------------------- positions
-        positions = (
-            pd.DataFrame(self.element_types_json)
-            .drop(
-                [
-                    "plural_name",
-                    "plural_name_short",
-                    "ui_shirt_specific",
-                    "sub_positions_locked",
-                ],
-                axis=1,
-            )
-            .rename(
-                columns={
-                    "id": "position_id",
-                    "singular_name": "pos_name_long",
-                    "singular_name_short": "position",
-                    "element_count": "count",
-                }
-            )
-            .set_index("position_id")
-        )
-
-        # --------------------------------------------------------------- teams
-        teams = (
-            pd.DataFrame(self.teams_json)
-            .drop(
-                [
-                    "code",
-                    "played",
-                    "form",
-                    "win",
-                    "draw",
-                    "loss",
-                    "points",
-                    "position",
-                    "team_division",
-                    "unavailable",
-                    "pulse_id",
-                ],
-                axis=1,
-            )
-            .rename(
-                columns={
-                    "id": "team_id",
-                    "short_name": "team",
-                    "name": "team_name_long",
-                }
-            )
-            .set_index("team_id")
-        )
-
-        # ------------------------------------------------------------- players
-        players = (
-            pd.DataFrame(self.elements_json)
-            .rename(
-                # rename columns
-                columns=RENAME_COLUMNS
-            )
-            .astype(
-                {
-                    # change data types
-                    "points_per_game": "float64",
-                    "expected_goals": "float64",
-                    "expected_assists": "float64",
-                    "expected_goal_involvements": "float64",
-                    "expected_goals_conceded": "float64",
-                    "influence": "float64",
-                    "creativity": "float64",
-                    "threat": "float64",
-                    "ict_index": "float64",
-                    "selected_by_percent": "float64",
-                }
-            )
-            .merge(teams[["team", "team_name_long"]], on="team_id")
-            .merge(positions[["position", "pos_name_long"]], on="position_id")
-        )
-
-        # exclude players who haven't played any minutes
-        players = players[players["minutes_played"] > 0]
-
-        # calculate additional per 90 stats
-        players = players.assign(
-            goal_involvements=lambda x: x.goals_scored + x.assists,
-            total_points_per_90=lambda x: x.total_points / x.minutes_played * 90,
-            goals_scored_per_90=lambda x: x.goals_scored / x.minutes_played * 90,
-            assists_per_90=lambda x: x.assists / x.minutes_played * 90,
-            goal_involvements_per_90=lambda x: (x.goals_scored + x.assists)
-            / x.minutes_played
-            * 90,
-            bonus_points_system_per_90=lambda x: x.bonus_points_system
-            / x.minutes_played
-            * 90,
-            influence_per_90=lambda x: x.influence / x.minutes_played * 90,
-            creativity_per_90=lambda x: x.creativity / x.minutes_played * 90,
-            threat_per_90=lambda x: x.threat / x.minutes_played * 90,
-            ict_index_per_90=lambda x: x.ict_index / x.minutes_played * 90,
-        )
-
-        # convert price to in-game values
-        players["price"] = players["price"] / 10
-
-        # select only columns of interest
-        players = (
-            players.drop(["team_id", "position_id"], axis=1)
-            .set_index("player_id")
-            .round(1)
-        )
-
-        self.gameweeks_df = gameweeks
-        self.teams_df = teams
-        self.positions_df = positions
-        self.players_df = players
+                return event["id"]
+        return 1
 
     def get_fixtures_matrix(
         self, start_gw: Optional[int] = None, num_gw: int = 8
@@ -318,10 +142,18 @@ class FplApiDataTransformed(FplApiDataRaw):
         element_summary = get_element_summary(player_id)
         print("DONE!\n")
 
-        df = pd.json_normalize(element_summary[type]).rename(
-            # rename columns
-            columns=RENAME_COLUMNS
-        )
+        renames = {
+            "id": "player_id",
+            "team": "team_id",
+            "element_type": "position_id",
+            "second_name": "last_name",
+            "web_name": "player_name",
+            "now_cost": "price",
+            "minutes": "minutes_played",
+            "bonus": "bonus_points",
+            "bps": "bonus_points_system",
+        }
+        df = pd.json_normalize(element_summary[type]).rename(columns=renames)
 
         if type == "fixtures":
             df["team_id"] = df.apply(

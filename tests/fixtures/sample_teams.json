@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "name": "Arsenal",
+    "short_name": "ARS",
+    "strength": 4,
+    "strength_overall_home": 1200,
+    "strength_overall_away": 1180
+  },
+  {
+    "id": 2, 
+    "name": "Aston Villa",
+    "short_name": "AVL",
+    "strength": 4,
+    "strength_overall_home": 1150,
+    "strength_overall_away": 1120
+  }
+]
